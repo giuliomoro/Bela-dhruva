@@ -296,7 +296,7 @@ endif
 
 IS_AM572x = $(shell grep -q AI /proc/device-tree/model && echo 1||echo 0)
 ifeq ($(AT),)
-  $(info Running on AI$(IS_AM572x)flag) 
+  $(info Running on AI$(IS_AM572x)flag)
 endif
 
 DEFAULT_COMMON_FLAGS := $(DEFAULT_XENOMAI_CFLAGS) -O3 -g -march=armv7-a -mtune=cortex-a8 -mfloat-abi=hard -mfpu=neon -ftree-vectorize -ffast-math -DNDEBUG -D$(BELA_USE_DEFINE) -I$(BASE_DIR)/resources/$(DEBIAN_VERSION)/include -save-temps=obj -DIS_AM572x$(IS_AM572x)
