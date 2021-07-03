@@ -294,6 +294,8 @@ ifeq ($(XENOMAI_VERSION),3)
   BELA_USE_DEFINE=BELA_USE_RTDM
 endif
 
+IS_AM572x :=$(shell grep -q AI /proc/device-tree/model && echo 1 || echo 0)
+
 DEFAULT_COMMON_FLAGS := $(DEFAULT_XENOMAI_CFLAGS) -O3 -g -march=armv7-a -mtune=cortex-a8 -mfloat-abi=hard -mfpu=neon -ftree-vectorize -ffast-math -DNDEBUG -D$(BELA_USE_DEFINE) -I$(BASE_DIR)/resources/$(DEBIAN_VERSION)/include -save-temps=obj
 DEFAULT_CPPFLAGS := $(DEFAULT_COMMON_FLAGS) -std=c++11
 DEFAULT_CFLAGS := $(DEFAULT_COMMON_FLAGS) -std=gnu11
@@ -308,6 +310,10 @@ BELA_LDLIBS += $(LIBPD_LIBS)
 DEFAULT_PD_CPP_SRCS := ./core/default_libpd_render.cpp
 DEFAULT_PD_OBJS := $(addprefix build/core/,$(notdir $(DEFAULT_PD_CPP_SRCS:.cpp=.o)))
 ALL_DEPS += $(addprefix build/core/,$(notdir $(DEFAULT_PD_CPP_SRCS:.cpp=.d)))
+
+ifeq ($(IS_AM572x),1)
+  DEFAULT_COMMON_FLAGS+=-DIS_AM572x
+endif
 
 # TODO: replace the below with proper parsing of default_libpd_render.ii
 include libraries/Midi/build/Makefile.link
