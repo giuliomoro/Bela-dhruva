@@ -12,7 +12,7 @@
 ## CPPFLAGS=           -- list of additional flags passed to the C++ compiler
 ## CFLAGS=             -- list of additional flags passed to the C compiler
 ## COMPILER=            -- compiler to use (clang or gcc)
-## LDFLAGS=                -- linker flags (e.g.: -L. )
+## LDFLAGS=                -- linker flags (e.g.: -L. ) 
 ## LDLIBS=                -- libs to link in (e.g.: -lm )
 ## AT=                  -- used instead of @ to silence the output. Defaults AT=@, use AT= for a very verbose output
 ## DISTCC=              -- specify whether to use distcc (1) or not (0, default)
@@ -26,7 +26,7 @@ DISTCC ?= 0 # set this to 1 to use distcc by default
 
 # an empty recipe to avoid implicit rules for .d files
 %.d:
-
+	
 AT?=@
 NO_PROJECT_TARGETS+=help coreclean distclean startup startuploop stopstartup stoprunning stop nostartup connect_startup connect idestart idestop idestartup idenostartup ideconnect scsynthstart scsynthstop scsynthconnect scsynthstartup scsynthnostartup update checkupdate updateunsafe lib lib/libbela.so lib/libbelaextra.so lib/libbela.a lib/libbelaextra.a csoundstart
 NO_PROJECT_TARGETS_MESSAGE=PROJECT or EXAMPLE should be set for all targets except: $(NO_PROJECT_TARGETS)
@@ -52,7 +52,7 @@ help: ## Show this help
 	$(AT) printf "\n$(NO_PROJECT_TARGETS_MESSAGE)\n\n"
 	$(AT) echo 'Targets: (default: $(.DEFAULT_GOAL))'
 	$(AT) echo list: $(MAKEFILE_LIST)
-	$(AT) fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/^\(.*\): .*##\(.*\)/\1:#\2/' | sed -e 's/^\(.*\)= .* -- \(.*\)/\1=#\2/' | sed 's/^##//' | awk -F"#" '{ printf "%-18s %-1s\n", $$1, $$2}'
+	$(AT) fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/^\(.*\): .*##\(.*\)/\1:#\2/' | sed -e 's/^\(.*\)= .* -- \(.*\)/\1=#\2/' | sed 's/^##//' | awk -F"#" '{ printf "%-18s %-1s\n", $$1, $$2}' 
 
 # PROJECT or EXAMPLE must be set for targets that are not included in NO_PROJECT_TARGETS
 ifeq (,$(filter $(NO_PROJECT_TARGETS),$(MAKECMDGOALS)))
@@ -82,7 +82,7 @@ endif
 
 COMMAND_LINE_OPTIONS?=$(CL)
 ifeq ($(RUN_WITH_PRU_BIN),true)
-# Only use this one for development. You may have to run it without this option at least once, to generate
+# Only use this one for development. You may have to run it without this option at least once, to generate 
 # include/pru_rtaudio_bin.h
 ifndef PROJECT
 $(warning PROJECT is not defined, so RUN_WITH_PRU_BIN will be ignored)
@@ -188,7 +188,7 @@ endif
 endif
 
 RUN_IDE_COMMAND?=PATH=$$PATH:/usr/local/bin/ stdbuf -oL -eL $(RUN_COMMAND)
-BELA_AUDIO_THREAD_NAME?=bela-audio
+BELA_AUDIO_THREAD_NAME?=bela-audio 
 XENO_CONFIG=/usr/xenomai/bin/xeno-config
 XENOMAI_SKIN=posix
 
@@ -296,7 +296,7 @@ endif
 
 IS_AM572x = $(shell grep -q AI /proc/device-tree/model && echo 1||echo 0)
 ifeq ($(AT),)
-  $(info Running on AI$(IS_AM572x)flag)
+  $(info Running on AI$(IS_AM572x)flag) 
 endif
 
 DEFAULT_COMMON_FLAGS := $(DEFAULT_XENOMAI_CFLAGS) -O3 -g -march=armv7-a -mtune=cortex-a8 -mfloat-abi=hard -mfpu=neon -ftree-vectorize -ffast-math -DNDEBUG -D$(BELA_USE_DEFINE) -I$(BASE_DIR)/resources/$(DEBIAN_VERSION)/include -save-temps=obj -DIS_AM572x$(IS_AM572x)
@@ -348,7 +348,7 @@ ifeq ($(COMPILER), clang)
   CXX=$(CLANG_PATH)++
   DEFAULT_CPPFLAGS += -DNDEBUG # Maybe we should add back in -no-integrated-as?
   DEFAULT_CFLAGS += -DNDEBUG
-else
+else 
   ifeq ($(COMPILER), gcc)
     CC=gcc
     CXX=g++
@@ -420,7 +420,7 @@ ALL_DEPS += ./build/core/default_main.d
 Bela: ## Builds the Bela program with all the optimizations
 Bela: $(OUTPUT_FILE)
 
-# all = build Bela
+# all = build Bela 
 all: ## Same as Bela
 all: SYNTAX_FLAG :=
 all: Bela
@@ -435,7 +435,7 @@ debug: all
 syntax: ## Only checks syntax
 syntax: CC=clang
 syntax: CXX=clang++
-syntax: $(PROJECT_OBJS)
+syntax: $(PROJECT_OBJS) 
 ifneq (,$(filter syntax,$(MAKECMDGOALS)))
 SYNTAX_FLAG := -fsyntax-only
 endif
@@ -572,7 +572,7 @@ endif # ifeq ($(SHOULD_BUILD),false)
 
 projectclean: ## Remove the PROJECT's build objects & binary
 	-$(RM) $(PROJECT_DIR)/build/* $(OUTPUT_FILE)
-	-@echo ' '
+	-@echo ' '	
 
 clean: ## Same as projectclean
 clean: projectclean
@@ -585,10 +585,10 @@ coreclean: ## Remove the core's build objects
 prompt:
 	$(AT) printf "Warning: you are about to DELETE the projects/ folder and its content. This operation cannot be undone. Continue? (y/N) "
 	$(AT) read REPLY; if [ $$REPLY !=  y ] && [ $$REPLY != Y ]; then echo "Aborting..."; exit 1; fi
-
+	
 distclean: ## Restores the Bela folder to a pristine state: remove all the projects source and the built objects, including the core Bela objects.
 distclean: prompt distcleannoprompt
-
+	
 distcleannoprompt: ## Same as distclean, but does not prompt for confirmation. Use with care.
 	-$(RM) build/source/* $(CORE_OBJS) $(CORE_CPP_DEPS) $(DEFAULT_MAIN_OBJS) $(DEFAULT_MAIN_CPP_DEPS) $(OUTPUT_FILE)
 	-@echo ' '
@@ -614,7 +614,7 @@ runscreenfg: stop $(OUTPUT_FILE)
 	$(AT) echo "Running $(RUN_COMMAND) in a screen"
 	$(AT) cd $(RUN_FROM) && screen -S $(SCREEN_NAME) -m $(RUN_COMMAND)
 
-nostartup: ## No Bela project runs at startup
+nostartup: ## No Bela project runs at startup 
 nostartup:
 	$(AT) echo "Disabling Bela at startup..."
 	$(AT) $(BELA_DISABLE_STARTUP_COMMAND)
@@ -641,7 +641,7 @@ ifeq ($(PROJECT_TYPE),sc)
 #if we are about to start a sc project, these killall should be synchronous, otherwise they may kill they newly-spawn sclang process
 	$(AT) killall scsynth 2>/dev/null; killall sclang 2>/dev/null; true
 else
-#otherwise, it safe if they are asynchronous (faster). The Bela program will still be able to start as the
+#otherwise, it safe if they are asynchronous (faster). The Bela program will still be able to start as the 
 # audio thread has been killed above
 	$(AT) killall scsynth 2>/dev/null& killall sclang 2>/dev/null& true
 endif
@@ -656,7 +656,7 @@ endif
 
 connect: ## Connects to the running Bela program (if any), can detach with ctrl-a ctrl-d.
 	$(AT) screen -r -S $(SCREEN_NAME)
-
+	
 idestart: ## Starts the on-board IDE
 ifeq ($(DEBIAN_VERSION),wheezy)
 # when using systemctl, idestart does not require idestop.
@@ -687,7 +687,7 @@ csoundstart: # Start csound
 
 SCSYNTH_SCREEN_NAME=scsynth
 SCSYNTH_RUN_COMMAND=screen -S $(SCSYNTH_SCREEN_NAME) -d -m scsynth $(SC_CL)
-SCSYNTH_STOP_COMMAND?=screen -X -S $(SCSYNTH_SCREEN_NAME) quit > /dev/null
+SCSYNTH_STOP_COMMAND?=screen -X -S $(SCSYNTH_SCREEN_NAME) quit > /dev/null 
 scsynthstart: ## Starts scsynth
 scsynthstart: scsynthstop
 	$(AT) printf "Starting scsynth..."
@@ -702,7 +702,7 @@ scsynthstop: ## Stops scsynth
 scsynthconnect: ## Brings in the foreground the scsynth that currently is running in a screen (if any), can detach with ctrl-a ctrl-d.
 	$(AT) screen -r -S $(SCSYNTH_SCREEN_NAME)
 
-SCSYNTH_STARTUP_COMMAND=printf '\#!/bin/sh\n\#\n\# This file is autogenerated by Bela. Do not edit!\n\necho Running scsynth...\n$(SCSYNTH_RUN_COMMAND)\n'
+SCSYNTH_STARTUP_COMMAND=printf '\#!/bin/sh\n\#\n\# This file is autogenerated by Bela. Do not edit!\n\necho Running scsynth...\n$(SCSYNTH_RUN_COMMAND)\n' 
 scsynthstartup: ## Enables scsynth at startup
 	$(SCSYNTH_STARTUP_COMMAND) > $(BELA_STARTUP_SCRIPT)
 
@@ -727,7 +727,7 @@ checkupdate: ## Unzips the zip file in $(UPDATES_DIR) and checks that it contain
 	$(AT) # Strip the top-level folder ( if there is only one )
 	$(AT) DIR=`ls -d $(UPDATE_SOURCE_DIR)` && COUNT=`ls $$DIR | wc -l` &&\
 	  [ $$COUNT -eq 1 ] && mv $(UPDATE_SOURCE_DIR)/* /tmp/supertemp && rm -rf $(UPDATE_SOURCE_DIR) && mv /tmp/supertemp $(UPDATE_SOURCE_DIR)
-
+	
 	$(AT) echo Validating unzipped archive...
 	$(AT) cd $(UPDATE_SOURCE_DIR) && FAIL=0 && for path in $(UPDATE_REQUIRED_PATHS); do `ls $$path >/dev/null 2>&1` || { FAIL=1; break; }; done;\
 	  [ $$FAIL -eq 0 ] || { echo "$$path was not found in the zip archive. Maybe it is corrupted?"; exit 1; }
@@ -743,7 +743,7 @@ UPDATE_LOG_SUCCESS:=echo SUCCESS=true $(LOG)
 updateunsafe: ## Installs the update from $(UPDATES_DIR) in a more brick-friendly way
 	$(AT) $(UPDATE_LOG_INIT)
 	$(AT) echo METHOD=make updateunsafe $(LOG)
-	# Re-perform the check, just in case ...
+	# Re-perform the check, just in case ...	
 	$(AT) cd $(UPDATE_SOURCE_DIR) && FAIL=0 && for path in $(UPDATE_REQUIRED_PATHS); do `ls $$path >/dev/null 2>&1` || { FAIL=1; break; }; done;\
 	  [ $$FAIL -eq 0 ] || { echo "$$path was not found in the zip archive. Maybe it is corrupted?"; exit 1; }
 	$(AT) cd $(UPDATE_SOURCE_DIR)/scripts $(LOG) && BBB_ADDRESS=root@127.0.0.1 BBB_BELA_HOME=$(BELA_DIR) ./update_board -y --no-frills $(TEE_LOG)
