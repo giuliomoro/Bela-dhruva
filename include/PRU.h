@@ -140,7 +140,7 @@ typedef struct {
 } InternalBelaContext;
 
 // Create object of class PruManager
-PruManager *prumanager = new PruManagerUio(pru_number);
+PruManager *prumanager = new PruManagerUio();
 class PruMemory;
 class PRU
 {
