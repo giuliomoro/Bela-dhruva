@@ -1545,7 +1545,8 @@ void PRU::waitForFinish()
 void PRU::disable()
 {
     /* Disable PRU and close memory mapping*/
-    prussdrv_pru_disable(pru_number);
+    //  prussdrv_pru_disable(pru_number);
+    prumanager->stop();
 	running = false;
 }
 

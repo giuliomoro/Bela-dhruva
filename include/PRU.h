@@ -4,6 +4,7 @@
 #include "Bela.h"
 #include "Gpio.h"
 #include "AudioCodec.h"
+#include "PruManager.h"
 
 /**
  * Internal version of the BelaContext struct which does not have const
@@ -177,6 +178,9 @@ public:
 
 	// Exit the whole PRU subsystem
 	void exitPRUSS();
+
+    // Create object of class PruManager
+    PruManager *prumanager = new PruManagerUio(pru_number);
 
 private:
 	void initialisePruCommon(const McaspRegisters& mcaspRegisters);
