@@ -139,8 +139,6 @@ typedef struct {
 	operator BelaContext () {return *(BelaContext*)this;}
 } InternalBelaContext;
 
-// Create object of class PruManager
-PruManager *prumanager = new PruManagerUio();
 class PruMemory;
 class PRU
 {
@@ -180,6 +178,9 @@ public:
 
 	// Exit the whole PRU subsystem
 	void exitPRUSS();
+
+    // Create object of class PruManager
+    PruManager *prumanager = new PruManagerUio(pru_number);
 
 private:
 	void initialisePruCommon(const McaspRegisters& mcaspRegisters);
