@@ -100,7 +100,7 @@ public:
 	PruMemory(int pruNumber, InternalBelaContext* newContext) :
 		context(newContext)
 	{
-		prumanager.setVal(pruNumber,gRTAudioVerbose);
+		// prumanager.setVal(pruNumber,gRTAudioVerbose);
 		prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
 		audioIn.resize(context->audioInChannels * context->audioFrames);
 		audioOut.resize(context->audioOutChannels * context->audioFrames);
