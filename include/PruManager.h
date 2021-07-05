@@ -21,6 +21,7 @@ public:
 	std::map<unsigned int, unsigned int> pru_addr;   // prunum : pru address
 	unsigned int pru_num, verbose;
 	PruManager();
+	void setVal(unsigned int pruNum=1,unsigned int v=0);	// assigns values to pru_num and verbosity
 	// virtual void readstate() = 0;
 	virtual void start() = 0;
 	virtual void stop() = 0;

@@ -34,6 +34,11 @@ PruManager::PruManager(){
 	}
 }
 
+void PruManager::setVal(unsigned int pruNum=1,unsigned int v=0){
+	pru_num = pruNum;
+	verbose = v;
+}
+
 PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v){
 	/* constructor for initializing the necessary path variables
 	 * based on the value of pru_num to choose:
