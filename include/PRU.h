@@ -139,10 +139,8 @@ typedef struct {
 	operator BelaContext () {return *(BelaContext*)this;}
 } InternalBelaContext;
 
-// Create object of class PruManagerUio
-// here we can add an if-else probably as to if we want to use rproc of uio.
-// with the help of some enable_rproc flag
-PruManagerUio prumanager;
+// Create object of class PruManager
+PruManager *prumanager = new PruManagerUio(pru_number);
 class PruMemory;
 class PRU
 {
