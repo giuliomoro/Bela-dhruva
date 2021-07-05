@@ -34,7 +34,7 @@ PruManager::PruManager(){
 	}
 }
 
-void PruManager::setVal(unsigned int pruNum=1,unsigned int v=0){
+void PruManager::setVal(unsigned int pruNum,unsigned int v){
 	pru_num = pruNum;
 	verbose = v;
 }
