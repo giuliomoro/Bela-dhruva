@@ -180,7 +180,7 @@ public:
 	void exitPRUSS();
 
     // Create object of class PruManager
-    PruManager *prumanager = new PruManagerUio(pru_number);
+    PruManager *prumanager;
 
 private:
 	void initialisePruCommon(const McaspRegisters& mcaspRegisters);
