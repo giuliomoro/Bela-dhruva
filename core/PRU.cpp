@@ -222,7 +222,7 @@ PRU::PRU(InternalBelaContext *input_context)
   audio_expander_input_history(0), audio_expander_output_history(0),
   audio_expander_filter_coeff(0), pruUsesMcaspIrq(false), belaHw(BelaHw_NoHw)
 {
-    *prumanager = new PruManagerUio(pru_number);
+    prumanager = new PruManagerUio(pru_number);
 }
 
 // Destructor
