@@ -74,8 +74,8 @@ void PruManagerRprocMmap::start(){	// performs echo start > state
 		std::cout << "Starting the PRU1_0 \n";
 	//mode = TRUNCATE; by default
 	IoUtils::writeTextFile(statePath, "start");
-	system(firmwareCopyCommand.c_str());	// copies fw to /lib/am57xx-fw
-	if(verbose)
+	system(firmwareCopyCommand.c_str());    // copies fw to /lib/am57xx-fw	
+    if(verbose)
 		std::cout << "Loading firmware into the PRU1_0 \n";
 	//mode = TRUNCATE; by default
 	IoUtils::writeTextFile(firmwarePath,firmware);  // reload the new fw in PRU
