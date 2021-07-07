@@ -104,6 +104,6 @@ void PruManagerUio::stop(){
 	prussdrv_pru_disable(pru_num);
 }
 
-void PruManagerUio::map_pru_mem(unsigned int pru_ram_id, void **address){
+void PruManagerUio::map_pru_mem(unsigned int pru_ram_id, char* address){
 	prussdrv_map_prumem (pru_ram_id, (void **)&address);
 }
