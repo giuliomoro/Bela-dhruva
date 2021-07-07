@@ -385,11 +385,7 @@ int PRU::initialise(BelaHw newBelaHw, int pru_num, bool uniformSampleRate, int m
 	pru_number = pru_num;
 
 	/* Allocate and initialize memory */
-	prussdrv_init();
-	if(prussdrv_open(PRU_EVTOUT_0)) {
-		fprintf(stderr, "Failed to open PRU driver\n");
-		return 1;
-	}
+
 	prumanager->start();
 	pruMemory = new PruMemory(pru_number, context, *prumanager);
 
