@@ -97,10 +97,11 @@ extern int gRTAudioVerbose;
 class PruMemory
 {
 public:
-	PruMemory(int pruNumber, InternalBelaContext* newContext) :
+	PruMemory(int pruNumber, InternalBelaContext* newContext, PruManager& prumanager) :
 		context(newContext)
 	{
-		prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
+		//prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
+		prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
 		audioIn.resize(context->audioInChannels * context->audioFrames);
 		audioOut.resize(context->audioOutChannels * context->audioFrames);
 		digital.resize(context->digitalFrames);
@@ -112,7 +113,8 @@ public:
 		pruDigitalStart[1] = pruSharedRam + PRU_MEM_DIGITAL_OFFSET + PRU_MEM_DIGITAL_BUFFER1_OFFSET;
 		if(context->analogFrames > 0)
 		{
-			prussdrv_map_prumem (pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
+			// prussdrv_map_prumem (pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
+			prumanager.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
 			analogOut.resize(context->analogOutChannels * context->analogFrames);
 			analogIn.resize(context->analogInChannels * context->analogFrames);
 			pruAnalogOutStart[0] = pruDataRam + PRU_MEM_DAC_OFFSET;
@@ -390,7 +392,7 @@ int PRU::initialise(BelaHw newBelaHw, int pru_num, bool uniformSampleRate, int m
 		fprintf(stderr, "Failed to open PRU driver\n");
 		return 1;
 	}
-	pruMemory = new PruMemory(pru_number, context);
+	pruMemory = new PruMemory(pru_number, context, *prumanager);
 
 	if(0 <= stopButtonPin){
 		stopButton.open(stopButtonPin, Gpio::INPUT, false);
