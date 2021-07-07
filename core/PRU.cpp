@@ -94,10 +94,6 @@ using namespace BelaHwComponent;
                                          // 256 is the maximum number of frames allowed
 extern int gRTAudioVerbose;
 
-void funcmem(unsigned int pru_ram_id, char*& address){
-	prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&address);
-}
-
 class PruMemory
 {
 public:
@@ -106,9 +102,8 @@ public:
 	{
 		// PruManagerUio pruman;
 		// prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
-		// prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, pruDataRam);
+		prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, &pruDataRam);
 		// pruman.map_pru_mem(PRUSS0_SHARED_DATARAM, pruSharedRam);
-		funcmem(PRUSS0_SHARED_DATARAM, pruSharedRam);
 		printf("1st prushareram: %#x\n", pruSharedRam);
 		audioIn.resize(context->audioInChannels * context->audioFrames);
 		audioOut.resize(context->audioOutChannels * context->audioFrames);
@@ -122,7 +117,7 @@ public:
 		if(context->analogFrames > 0)
 		{
 			// prussdrv_map_prumem (pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
-			prumanager.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, pruDataRam);
+			prumanager.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, &pruDataRam);
 			printf("2nd prushareram: %#x\n", pruSharedRam);
 			// pruman.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, pruDataRam);
 			analogOut.resize(context->analogOutChannels * context->analogFrames);
