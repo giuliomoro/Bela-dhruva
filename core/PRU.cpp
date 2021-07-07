@@ -390,6 +390,7 @@ int PRU::initialise(BelaHw newBelaHw, int pru_num, bool uniformSampleRate, int m
 		fprintf(stderr, "Failed to open PRU driver\n");
 		return 1;
 	}
+	prumanager->start();
 	pruMemory = new PruMemory(pru_number, context, *prumanager);
 
 	if(0 <= stopButtonPin){

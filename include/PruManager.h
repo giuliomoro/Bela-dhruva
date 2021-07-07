@@ -21,7 +21,7 @@ public:
 	unsigned int pru_num, verbose;
 	PruManager();
 	// virtual void readstate() = 0;
-	virtual void start() = 0;
+	virtual int start() = 0;
 	virtual void stop() = 0;
 	virtual void map_pru_mem(unsigned int pru_ram_id,  char** address) = 0;
 };
@@ -33,7 +33,7 @@ public:
 	PruManagerRprocMmap(unsigned int pruNum=0, unsigned int v=0);
 	void readstate();
 	void stop();
-	void start();
+	int start();
 	void map_pru_mem(unsigned int pru_ram_id, char** address);
 private:
 	int verbose = 0;
@@ -51,7 +51,7 @@ class PruManagerUio : public PruManager{
 */
 public:
 	PruManagerUio(unsigned int pruNum=0, unsigned int v=0);
-	void start();
+	int start();
 	void stop();
 	void map_pru_mem(unsigned int pru_ram_id,  char** address);
 };
