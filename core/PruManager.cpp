@@ -106,5 +106,5 @@ void PruManagerUio::stop(){
 
 void PruManagerUio::map_pru_mem(unsigned int pru_ram_id, char** address){
 	printf("now func prushareram: %#x\n", address);
-	prussdrv_map_prumem (pru_ram_id, (void **)&address);
+	prussdrv_map_prumem (pru_ram_id, (void **)address);
 }
