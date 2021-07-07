@@ -178,7 +178,7 @@ public:
 	uint32_t* getDigitalPtr() { return digital.data(); }
 	uint32_t* getPruBufferComm() { return (uint32_t*)(pruSharedRam + PRU_MEM_COMM_OFFSET); }
 private:
-	char* pruDataRam = NULL;
+	const char* pruDataRam = NULL;
 	char* pruSharedRam = NULL;
 	char* pruAnalogInStart[2];
 	char* pruAudioInStart[2];
