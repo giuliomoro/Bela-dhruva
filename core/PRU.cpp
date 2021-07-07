@@ -94,16 +94,21 @@ using namespace BelaHwComponent;
                                          // 256 is the maximum number of frames allowed
 extern int gRTAudioVerbose;
 
+void funcmem(unsigned int pru_ram_id, char*& address){
+	prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&address);
+}
+
 class PruMemory
 {
 public:
 	PruMemory(int pruNumber, InternalBelaContext* newContext, PruManager& prumanager) :
 		context(newContext)
 	{
-		PruManagerUio pruman;
+		// PruManagerUio pruman;
 		// prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
-		prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, pruDataRam);
+		// prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, pruDataRam);
 		// pruman.map_pru_mem(PRUSS0_SHARED_DATARAM, pruSharedRam);
+		funcmem(PRUSS0_SHARED_DATARAM, pruSharedRam);
 		printf("1st prushareram: %#x\n", pruSharedRam);
 		audioIn.resize(context->audioInChannels * context->audioFrames);
 		audioOut.resize(context->audioOutChannels * context->audioFrames);
