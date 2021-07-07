@@ -98,8 +98,9 @@ int PruManagerUio::start(){
 	prussdrv_init();
 	if(prussdrv_open(PRU_EVTOUT_0)) {
 		fprintf(stderr, "Failed to open PRU driver\n");
-		return;
+		return 1;
 	}
+	return 0;
 }
 
 void PruManagerUio::stop(){
