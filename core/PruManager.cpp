@@ -82,7 +82,7 @@ void PruManagerRprocMmap::start(){	// performs echo start > state
 
 }
 
-void PruManagerRprocMmap::map_pru_mem(unsigned int pru_ram_id, char** address){
+void PruManagerRprocMmap::map_pru_mem(unsigned int pru_ram_id, char*& address){
 	//do nothing for now.
 }
 
@@ -104,9 +104,7 @@ void PruManagerUio::stop(){
 	prussdrv_pru_disable(pru_num);
 }
 
-void PruManagerUio::map_pru_mem(unsigned int pru_ram_id, char** address){
-	char* str_addr = NULL;
-	prussdrv_map_prumem (pru_ram_id, (void **)str_addr);
-	printf("now func prushareram: %#x\n", str_addr);
-	*address = str_addr;
+void PruManagerUio::map_pru_mem(unsigned int pru_ram_id, char*& address){
+	prussdrv_map_prumem (pru_ram_id, (void **)address);
+	printf("now func prushareram: %#x\n", address);
 }
