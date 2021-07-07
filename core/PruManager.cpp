@@ -69,7 +69,7 @@ void PruManagerRprocMmap::stop(){	//performs echo stop > state
 	IoUtils::writeTextFile(statePath, "stop");
 }
 
-void PruManagerRprocMmap::start(){	// performs echo start > state
+int PruManagerRprocMmap::start(){	// performs echo start > state
 	if(verbose)
 		std::cout << "Starting the PRU1_0 \n";
 	//mode = TRUNCATE; by default
@@ -92,9 +92,14 @@ PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v){
 	verbose = v;
 }
 
-void PruManagerUio::start(){
+int PruManagerUio::start(){
 	// prussdrv_init() I guess.
 	// prussdrv_exec_program(pru_num, *filename);   // Maybe define filename in constructor
+	prussdrv_init();
+	if(prussdrv_open(PRU_EVTOUT_0)) {
+		fprintf(stderr, "Failed to open PRU driver\n");
+		return;
+	}
 }
 
 void PruManagerUio::stop(){
@@ -105,5 +110,5 @@ void PruManagerUio::stop(){
 }
 
 void PruManagerUio::map_pru_mem(unsigned int pru_ram_id, char** address){
-	prussdrv_map_prumem (pru_ram_id, (void **)&*address);
+	prussdrv_map_prumem (pru_ram_id, (void **)address);
 }
