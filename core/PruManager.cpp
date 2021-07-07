@@ -105,5 +105,6 @@ void PruManagerUio::stop(){
 }
 
 void PruManagerUio::map_pru_mem(unsigned int pru_ram_id, char* address){
+	std::cout << "INSIDE Func map pru mem\n";
 	prussdrv_map_prumem (pru_ram_id, (void **)&address);
 }
