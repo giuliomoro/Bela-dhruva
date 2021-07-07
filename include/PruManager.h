@@ -8,11 +8,10 @@
  *	  Author: Dhruva Gole
  */
 
-#include <fstream>
-#include "MiscUtilities.h"
-#include <iostream>
 #include <string>
+// #ifdef flagUIO
 #include <prussdrv.h>
+// #endif
 #include <map>
 
 class PruManager{
@@ -31,19 +30,19 @@ class PruManagerRprocMmap : public PruManager{
 /* use rproc for start/stop and mmap for memory sharing
  */
 public:
-	int verbose = 0;
+	PruManagerRprocMmap(unsigned int pruNum=0, unsigned int v=0);
+    void readstate();
+	void stop();
+	void start();
+	void map_pru_mem(unsigned int pru_ram_id, void **address);
+private:
+    int verbose = 0;
 	std::string basePath;
 	std::string statePath;
 	std::string firmwarePath;
 	std::string firmware;
 	std::string firmwareCopyCommand;
-	PruManagerRprocMmap(unsigned int pruNum=0, unsigned int v=0);
-	void readstate();
-	void stop();
-	void start();
-	void loadfw();
-	void copyfw();
-	void map_pru_mem(unsigned int pru_ram_id, void **address);
+
 };
 
 class PruManagerUio : public PruManager{
