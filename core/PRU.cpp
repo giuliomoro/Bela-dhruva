@@ -101,9 +101,9 @@ public:
 		context(newContext)
 	{
 		PruManagerUio pruman;
-		prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
-		printf("1 prushareram: %#x\n", pruSharedRam);
-		// prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, pruSharedRam);
+		// prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
+		printf("1st prushareram: %#x\n", pruSharedRam);
+		prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, pruSharedRam);
 		// pruman.map_pru_mem(PRUSS0_SHARED_DATARAM, pruSharedRam);
 		audioIn.resize(context->audioInChannels * context->audioFrames);
 		audioOut.resize(context->audioOutChannels * context->audioFrames);
@@ -117,8 +117,8 @@ public:
 		if(context->analogFrames > 0)
 		{
 			prussdrv_map_prumem (pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
-			printf("1 prushareram: %#x\n", pruSharedRam);
-			// prumanager.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, pruDataRam);
+			printf("2nd prushareram: %#x\n", pruSharedRam);
+			prumanager.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, pruDataRam);
 			// pruman.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, pruDataRam);
 			analogOut.resize(context->analogOutChannels * context->analogFrames);
 			analogIn.resize(context->analogInChannels * context->analogFrames);
