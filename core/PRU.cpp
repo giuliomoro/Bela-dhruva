@@ -102,7 +102,7 @@ public:
 	{
 		PruManagerUio pruman;
 		prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
-		std::cout << "here below prumanager calls func\n" << pruSharedRam << std::endl;
+		std::cout << "here below prumanager calls func\n" << *pruSharedRam << std::endl;
 		// prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, pruSharedRam);
 		// pruman.map_pru_mem(PRUSS0_SHARED_DATARAM, pruSharedRam);
 		audioIn.resize(context->audioInChannels * context->audioFrames);
@@ -117,7 +117,7 @@ public:
 		if(context->analogFrames > 0)
 		{
 			prussdrv_map_prumem (pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
-			std::cout << "here below prumanager calls func in if\n" << pruSharedRam << std::endl;
+			std::cout << "here below prumanager calls func in if\n" << *pruSharedRam << std::endl;
 			// prumanager.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, pruDataRam);
 			// pruman.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, pruDataRam);
 			analogOut.resize(context->analogOutChannels * context->analogFrames);
