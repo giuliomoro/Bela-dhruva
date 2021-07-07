@@ -178,13 +178,13 @@ public:
 	uint32_t* getDigitalPtr() { return digital.data(); }
 	uint32_t* getPruBufferComm() { return (uint32_t*)(pruSharedRam + PRU_MEM_COMM_OFFSET); }
 private:
-	const char* pruDataRam = NULL;
-	const char* pruSharedRam = NULL;
-	const char* pruAnalogInStart[2];
-	const char* pruAudioInStart[2];
-	const char* pruAnalogOutStart[2];
-	const char* pruAudioOutStart[2];
-	const char* pruDigitalStart[2];
+	char* pruDataRam = NULL;
+	char* pruSharedRam = NULL;
+	char* pruAnalogInStart[2];
+	char* pruAudioInStart[2];
+	char* pruAnalogOutStart[2];
+	char* pruAudioOutStart[2];
+	char* pruDigitalStart[2];
 	std::vector<uint16_t> analogIn;
 	std::vector<uint16_t> analogOut;
 	std::vector<int16_t> audioIn;
