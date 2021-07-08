@@ -9,9 +9,11 @@
  */
 
 #include <string>
-// #ifdef flagUIO
+
+#ifdef ENABLE_PRU_UIO1
 #include <prussdrv.h>
-// #endif
+#endif
+
 #include <map>
 
 class PruManager{
@@ -45,6 +47,7 @@ private:
 
 };
 
+#ifdef ENABLE_PRU_UIO1
 class PruManagerUio : public PruManager{
 /* wrapper for libprussdrv for both start/stop and memory sharing
  * It has the libprussdrv calls currently present in the codebase
@@ -56,8 +59,4 @@ public:
 	void map_pru_mem(unsigned int pru_ram_id, char** address);
 };
 
-class PruManagerAi : public PruManagerRprocMmap{
-/* Might be needed for something AI specific?
- * Not completely sure yet.
- */
-};
+#endif

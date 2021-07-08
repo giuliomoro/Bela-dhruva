@@ -15,7 +15,11 @@
 
 #include "../include/PRU.h"
 #include "../include/PruBinary.h"
+
+#ifdef ENABLE_PRU_UIO1
 #include <prussdrv.h>
+#endif
+
 #include "../include/digital_gpio_mapping.h"
 #include "../include/GPIOcontrol.h"
 #include "../include/Bela.h"
@@ -112,7 +116,7 @@ public:
 		pruDigitalStart[1] = pruSharedRam + PRU_MEM_DIGITAL_OFFSET + PRU_MEM_DIGITAL_BUFFER1_OFFSET;
 		if(context->analogFrames > 0)
 		{
-			prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, &pruDataRam);
+			prumanager.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, &pruDataRam);
 			analogOut.resize(context->analogOutChannels * context->analogFrames);
 			analogIn.resize(context->analogInChannels * context->analogFrames);
 			pruAnalogOutStart[0] = pruDataRam + PRU_MEM_DAC_OFFSET;
@@ -222,7 +226,9 @@ PRU::PRU(InternalBelaContext *input_context)
   audio_expander_input_history(0), audio_expander_output_history(0),
   audio_expander_filter_coeff(0), pruUsesMcaspIrq(false), belaHw(BelaHw_NoHw)
 {
-	prumanager = new PruManagerUio;
+	#ifdef ENABLE_PRU_UIO1
+        prumanager = new PruManagerUio;
+    #endif
 }
 
 // Destructor
@@ -1521,7 +1527,8 @@ void PRU::disable()
 void PRU::exitPRUSS()
 {
 	if(initialised)
-	    prussdrv_exit();
+		delete prumanager;
+	    // prussdrv_exit();
 	initialised = false;
 }
 
