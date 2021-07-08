@@ -86,6 +86,8 @@ void PruManagerRprocMmap::map_pru_mem(unsigned int pru_ram_id, char** address){
 	//do nothing for now.
 }
 
+
+#ifdef ENABLE_PRU_UIO1
 PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v){
 	// nothing to do
 	pru_num = pruNum;
@@ -113,3 +115,4 @@ void PruManagerUio::stop(){
 void PruManagerUio::map_pru_mem(unsigned int pru_ram_id, char** address){
 	prussdrv_map_prumem (pru_ram_id, (void **)address);
 }
+#endif
