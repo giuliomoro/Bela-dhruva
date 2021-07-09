@@ -227,10 +227,10 @@ PRU::PRU(InternalBelaContext *input_context)
   audio_expander_filter_coeff(0), pruUsesMcaspIrq(false), belaHw(BelaHw_NoHw)
 {
 	#ifdef ENABLE_PRU_UIO1
-        prumanager = new PruManagerUio;
+        prumanager = new PruManagerUio(pru_number, gRTAudioVerbose);
     #endif
 	#ifdef ENABLE_PRU_RPROC1
-		prumanager = new PruManagerRprocMmap;
+		prumanager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
 	#endif
 }
 
