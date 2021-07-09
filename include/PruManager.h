@@ -4,8 +4,8 @@
  * includes the classes required for introducing RProc functionality
  * but at the same time still support Mmap and libprussdrv
  *
- *  Created on: Jul 3, 2021
- *	  Author: Dhruva Gole
+ *	Created on: Jul 3, 2021
+ *		Author: Dhruva Gole
  */
 
 #include <string>
@@ -18,14 +18,14 @@
 
 class PruManager{
 // expose parameters for the relevant paths
-    public:
-    unsigned int pru_num, verbose;
-    PruManager();
-    // virtual void readstate() = 0;
-    virtual int start() = 0;
-    virtual void stop() = 0;
-    virtual void* getOwnMemory() = 0;
-    virtual void* getSharedMemory() = 0;
+	public:
+	unsigned int pru_num, verbose;
+	PruManager();
+	// virtual void readstate() = 0;
+	virtual int start() = 0;
+	virtual void stop() = 0;
+	virtual void* getOwnMemory() = 0;
+	virtual void* getSharedMemory() = 0;
 };
 
 
@@ -34,21 +34,21 @@ class PruManagerRprocMmap : public PruManager{
 /* use rproc for start/stop and mmap for memory sharing
  */
 public:
-    PruManagerRprocMmap(unsigned int pruNum=0, unsigned int v=0);
-    void readstate();
-    void stop();
-    int start();
-    void* getOwnMemory();
-    void* getSharedMemory();
+	PruManagerRprocMmap(unsigned int pruNum=0, unsigned int v=0);
+	void readstate();
+	void stop();
+	int start();
+	void* getOwnMemory();
+	void* getSharedMemory();
 private:
-    std::map<unsigned int, unsigned int> pru_addr;   // prunum : pru address
-    int verbose = 0;
-    std::string basePath;
-    std::string statePath;
-    std::string firmwarePath;
-    std::string firmware;
-    std::string firmwareCopyCommand;
-    long mem2;
+	std::map<unsigned int, unsigned int> pru_addr;	// prunum : pru address
+	int verbose = 0;
+	std::string basePath;
+	std::string statePath;
+	std::string firmwarePath;
+	std::string firmware;
+	std::string firmwareCopyCommand;
+	long mem2;
 };
 #endif
 
@@ -61,8 +61,8 @@ public:
 	PruManagerUio(unsigned int pruNum=0, unsigned int v=0);
 	int start();
 	void stop();
-    void* getOwnMemory();
-    void* getSharedMemory();
+	void* getOwnMemory();
+	void* getSharedMemory();
 };
 
 #endif
