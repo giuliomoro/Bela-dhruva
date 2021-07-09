@@ -15,6 +15,7 @@
 #endif
 
 #include <map>
+#include "Mmap.h"
 
 class PruManager{
 // expose parameters for the relevant paths
@@ -48,6 +49,8 @@ private:
 	std::string firmwarePath;
 	std::string firmware;
 	std::string firmwareCopyCommand;
+	Mmap ownMemory;
+	Mmap sharedMemory;
 	long mem2;
 };
 #endif
