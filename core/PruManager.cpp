@@ -2,8 +2,8 @@
  * PruManager.cpp
  * This code currently only works on BBAI
  *
- *  Created on: July 3, 2021
- *	  Author: Dhruva Gole
+ *	Created on: July 3, 2021
+ *		Author: Dhruva Gole
  */
 
 #include "../include/PruManager.h"
@@ -38,7 +38,7 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v){
 	firmwarePath = basePath + "firmware";
 	firmware = "am57xx-pru" + std::to_string(pruss) + "_" + std::to_string(prucore) + "-fw";
 	firmwareCopyCommand = "sudo rm /lib/firmware/" + firmware + ";sudo ln -s /home/debian/Bela-dhruva/pru/blinkR30.pru1_0.out /lib/firmware/" + firmware; // **NOTE**: Change the name of .out file according afterwards here and below cases.
-    // ToDo: add base addresses to be used by Mmap
+	// ToDo: add base addresses to be used by Mmap
 	// 0 : pruss-core 0 in BBB -> 4a334000
 	// 1 : pruss-core 1 in BBB -> 4a338000
 	// 0 : pruss1-core 0 in AI -> 4b234000
@@ -55,7 +55,7 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v){
 		pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4a334000));
 		pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4a338000));
 	}
-    long mem2 = 0x4b200000;
+	long mem2 = 0x4b200000;
 }
 
 void PruManagerRprocMmap::readstate(){	//Reads the current state of PRU
@@ -80,18 +80,18 @@ int PruManagerRprocMmap::start(){	// performs echo start > state
 	if(verbose)
 		std::cout << "Loading firmware into the PRU1_0 \n";
 	//mode = TRUNCATE; by default
-	IoUtils::writeTextFile(firmwarePath,firmware);  // reload the new fw in PRU
+	IoUtils::writeTextFile(firmwarePath,firmware);	// reload the new fw in PRU
 
 }
 
 void* PruManagerRprocMmap::getOwnMemory()
 {
-       return ownMemory.map(pru_addr[pru_num], 0x2000);  // addr is full address of the start of the PRU's RAM
+	return ownMemory.map(pru_addr[pru_num], 0x2000);	// addr is full address of the start of the PRU's RAM
 }
 
 void* PruManagerRprocMmap::getSharedMemory()
 {
-       return sharedMemory.map(addr2, 0x3000);  // addr2 is the address of the start of PRUSS Shared RAM
+	return sharedMemory.map(addr2, 0x3000);	// addr2 is the address of the start of PRUSS Shared RAM
 }
 #endif
 
@@ -104,7 +104,7 @@ PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v){
 
 int PruManagerUio::start(){
 	// prussdrv_init() I guess.
-	// prussdrv_exec_program(pru_num, *filename);   // Maybe define filename in constructor
+	// prussdrv_exec_program(pru_num, *filename);	// Maybe define filename in constructor
 	prussdrv_init();
 	if(prussdrv_open(PRU_EVTOUT_0)) {
 		fprintf(stderr, "Failed to open PRU driver\n");
@@ -122,22 +122,22 @@ void PruManagerUio::stop(){
 
 void* PruManagerUio::getOwnMemory()
 {
-       void* pruDataRam;
-       int ret = prussdrv_map_prumem (pru_num == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
-       if(ret)
-             return NULL;
-       else
-             return pruDataRam;
+	void* pruDataRam;
+	int ret = prussdrv_map_prumem (pru_num == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
+	if(ret)
+	return NULL;
+	else
+	return pruDataRam;
 }
 
 
 void* PruManagerUio::getSharedMemory()
 {
-       void* pruSharedRam;
-       int ret = prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
-       if(ret)
-            return NULL;
-       else
-            return pruSharedRam;
+	void* pruSharedRam;
+	int ret = prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
+	if(ret)
+	return NULL;
+	else
+	return pruSharedRam;
 }
 #endif
