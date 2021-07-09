@@ -104,7 +104,7 @@ public:
 	PruMemory(int pruNumber, InternalBelaContext* newContext, PruManager& prumanager) :
 		context(newContext)
 	{
-		prumanager.map_pru_mem(PRUSS0_SHARED_DATARAM, &pruSharedRam);
+		pruSharedRam = static_cast<char*>(prumanager.getSharedMemory());
 		audioIn.resize(context->audioInChannels * context->audioFrames);
 		audioOut.resize(context->audioOutChannels * context->audioFrames);
 		digital.resize(context->digitalFrames);
@@ -116,7 +116,7 @@ public:
 		pruDigitalStart[1] = pruSharedRam + PRU_MEM_DIGITAL_OFFSET + PRU_MEM_DIGITAL_BUFFER1_OFFSET;
 		if(context->analogFrames > 0)
 		{
-			prumanager.map_pru_mem(pruNumber == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, &pruDataRam);
+			pruDataRam = static_cast<char*>(prumanager.getOwnMemory());
 			analogOut.resize(context->analogOutChannels * context->analogFrames);
 			analogIn.resize(context->analogInChannels * context->analogFrames);
 			pruAnalogOutStart[0] = pruDataRam + PRU_MEM_DAC_OFFSET;
@@ -229,6 +229,9 @@ PRU::PRU(InternalBelaContext *input_context)
 	#ifdef ENABLE_PRU_UIO1
         prumanager = new PruManagerUio;
     #endif
+	#ifdef ENABLE_PRU_RPROC1
+		prumanager = new PruManagerRprocMmap;
+	#endif
 }
 
 // Destructor
@@ -759,6 +762,7 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 	}
 
 	/* Load and execute binary on PRU */
+#ifdef ENABLE_PRU_UIO1
 	if(filename[0] == '\0') { //if the string is empty, load the embedded code
 		if(gRTAudioVerbose)
 			printf("Using embedded PRU code\n");
@@ -774,6 +778,10 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 			return 1;
 		}
 	}
+#endif
+#ifdef ENABLE_PRU_RPROC1
+// do something else probably? Or simply not required.
+#endif
 
 	running = true;
 	return 0;
