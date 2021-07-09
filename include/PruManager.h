@@ -18,34 +18,39 @@
 
 class PruManager{
 // expose parameters for the relevant paths
-public:
-	std::map<unsigned int, unsigned int> pru_addr;   // prunum : pru address
-	unsigned int pru_num, verbose;
-	PruManager();
-	// virtual void readstate() = 0;
-	virtual int start() = 0;
-	virtual void stop() = 0;
-	virtual void map_pru_mem(unsigned int pru_ram_id, char** address) = 0;
+    public:
+    unsigned int pru_num, verbose;
+    PruManager();
+    // virtual void readstate() = 0;
+    virtual int start() = 0;
+    virtual void stop() = 0;
+    virtual void* getOwnMemory() = 0;
+    virtual void* getSharedMemory() = 0;
 };
 
+
+#ifdef ENABLE_PRU_RPROC1
 class PruManagerRprocMmap : public PruManager{
 /* use rproc for start/stop and mmap for memory sharing
  */
 public:
-	PruManagerRprocMmap(unsigned int pruNum=0, unsigned int v=0);
-	void readstate();
-	void stop();
-	int start();
-	void map_pru_mem(unsigned int pru_ram_id, char** address);
+    PruManagerRprocMmap(unsigned int pruNum=0, unsigned int v=0);
+    void readstate();
+    void stop();
+    int start();
+    void* getOwnMemory();
+    void* getSharedMemory();
 private:
-	int verbose = 0;
-	std::string basePath;
-	std::string statePath;
-	std::string firmwarePath;
-	std::string firmware;
-	std::string firmwareCopyCommand;
-
+    std::map<unsigned int, unsigned int> pru_addr;   // prunum : pru address
+    int verbose = 0;
+    std::string basePath;
+    std::string statePath;
+    std::string firmwarePath;
+    std::string firmware;
+    std::string firmwareCopyCommand;
+    long mem2;
 };
+#endif
 
 #ifdef ENABLE_PRU_UIO1
 class PruManagerUio : public PruManager{
@@ -56,7 +61,8 @@ public:
 	PruManagerUio(unsigned int pruNum=0, unsigned int v=0);
 	int start();
 	void stop();
-	void map_pru_mem(unsigned int pru_ram_id, char** address);
+    void* getOwnMemory();
+    void* getSharedMemory();
 };
 
 #endif

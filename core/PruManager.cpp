@@ -17,25 +17,9 @@
 #endif
 
 PruManager::PruManager(){
-	// ToDo: add base addresses to be used by Mmap
-	// 0 : pruss-core 0 in BBB -> 4a334000
-	// 1 : pruss-core 1 in BBB -> 4a338000
-	// 0 : pruss1-core 0 in AI -> 4b234000
-	// 1 : pruss1-core 1 in AI -> 4b238000
-	// 2 : pruss2-core 0 in AI -> 4b2b4000
-	// 3 : pruss2-core 1 in AI -> 4b2b8000
-	if(AM572x_Flag){
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4b234000));
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4b238000));
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(2,0x4b2b4000));
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(3,0x4b2b8000));
-	}
-	else{
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4a334000));
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4a338000));
-	}
 }
 
+#ifdef ENABLE_PRU_RPROC1
 PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v){
 	/* constructor for initializing the necessary path variables
 	 * based on the value of pru_num to choose:
@@ -54,6 +38,24 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v){
 	firmwarePath = basePath + "firmware";
 	firmware = "am57xx-pru" + std::to_string(pruss) + "_" + std::to_string(prucore) + "-fw";
 	firmwareCopyCommand = "sudo rm /lib/firmware/" + firmware + ";sudo ln -s /home/debian/Bela-dhruva/pru/blinkR30.pru1_0.out /lib/firmware/" + firmware; // **NOTE**: Change the name of .out file according afterwards here and below cases.
+    // ToDo: add base addresses to be used by Mmap
+	// 0 : pruss-core 0 in BBB -> 4a334000
+	// 1 : pruss-core 1 in BBB -> 4a338000
+	// 0 : pruss1-core 0 in AI -> 4b234000
+	// 1 : pruss1-core 1 in AI -> 4b238000
+	// 2 : pruss2-core 0 in AI -> 4b2b4000
+	// 3 : pruss2-core 1 in AI -> 4b2b8000
+	if(AM572x_Flag){
+		pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4b234000));
+		pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4b238000));
+		pru_addr.insert(std::pair<unsigned int, unsigned int>(2,0x4b2b4000));
+		pru_addr.insert(std::pair<unsigned int, unsigned int>(3,0x4b2b8000));
+	}
+	else{
+		pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4a334000));
+		pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4a338000));
+	}
+    long mem2 = 0x4b200000;
 }
 
 void PruManagerRprocMmap::readstate(){	//Reads the current state of PRU
@@ -82,10 +84,16 @@ int PruManagerRprocMmap::start(){	// performs echo start > state
 
 }
 
-void PruManagerRprocMmap::map_pru_mem(unsigned int pru_ram_id, char** address){
-	//do nothing for now.
+void* PruManagerRprocMmap::getOwnMemory()
+{
+       return ownMemory.map(pru_addr[pru_num], 0x2000);  // addr is full address of the start of the PRU's RAM
 }
 
+void* PruManagerRprocMmap::getSharedMemory()
+{
+       return sharedMemory.map(addr2, 0x3000);  // addr2 is the address of the start of PRUSS Shared RAM
+}
+#endif
 
 #ifdef ENABLE_PRU_UIO1
 PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v){
@@ -112,7 +120,24 @@ void PruManagerUio::stop(){
 	prussdrv_pru_disable(pru_num);
 }
 
-void PruManagerUio::map_pru_mem(unsigned int pru_ram_id, char** address){
-	prussdrv_map_prumem (pru_ram_id, (void **)address);
+void* PruManagerUio::getOwnMemory()
+{
+       void* pruDataRam;
+       int ret = prussdrv_map_prumem (pru_num == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
+       if(ret)
+             return NULL;
+       else
+             return pruDataRam;
+}
+
+
+void* PruManagerUio::getSharedMemory()
+{
+       void* pruSharedRam;
+       int ret = prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
+       if(ret)
+            return NULL;
+       else
+            return pruSharedRam;
 }
 #endif
