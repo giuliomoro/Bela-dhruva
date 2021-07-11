@@ -303,7 +303,6 @@ ENABLE_PRU_UIO = 1
 #<<<<<<<<<<<
 
 DEFAULT_COMMON_FLAGS := $(DEFAULT_XENOMAI_CFLAGS) -O3 -g -march=armv7-a -mtune=cortex-a8 -mfloat-abi=hard -mfpu=neon -ftree-vectorize -ffast-math -DNDEBUG -D$(BELA_USE_DEFINE) -I$(BASE_DIR)/resources/$(DEBIAN_VERSION)/include -save-temps=obj -DIS_AM572x$(IS_AM572x) -DENABLE_PRU_UIO$(ENABLE_PRU_UIO)
->>>>>>> 3e1d60d2... PRU: add flag ENABLE_PRU_UIO
 DEFAULT_CPPFLAGS := $(DEFAULT_COMMON_FLAGS) -std=c++11
 DEFAULT_CFLAGS := $(DEFAULT_COMMON_FLAGS) -std=gnu11
 BELA_LDFLAGS = -Llib/

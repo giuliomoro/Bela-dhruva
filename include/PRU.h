@@ -179,8 +179,8 @@ public:
 	// Exit the whole PRU subsystem
 	void exitPRUSS();
 
-    // Create object of class PruManager
-    PruManager *prumanager;
+	// Create object of class PruManager
+	PruManager *prumanager;
 
 private:
 	void initialisePruCommon(const McaspRegisters& mcaspRegisters);

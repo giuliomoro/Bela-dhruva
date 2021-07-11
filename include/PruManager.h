@@ -17,7 +17,8 @@
 #include <map>
 #include "Mmap.h"
 
-class PruManager{
+class PruManager
+{
 // expose parameters for the relevant paths
 	public:
 	unsigned int pru_num, verbose;
@@ -31,11 +32,12 @@ class PruManager{
 
 
 #ifdef ENABLE_PRU_RPROC1
-class PruManagerRprocMmap : public PruManager{
+class PruManagerRprocMmap : public PruManager
+{
 /* use rproc for start/stop and mmap for memory sharing
  */
 public:
-	PruManagerRprocMmap(unsigned int pruNum=0, unsigned int v=0);
+	PruManagerRprocMmap(unsigned int pruNum = 0, unsigned int v = 0);
 	void readstate();
 	void stop();
 	int start();
@@ -56,12 +58,13 @@ private:
 #endif
 
 #ifdef ENABLE_PRU_UIO1
-class PruManagerUio : public PruManager{
+class PruManagerUio : public PruManager
+{
 /* wrapper for libprussdrv for both start/stop and memory sharing
  * It has the libprussdrv calls currently present in the codebase
 */
 public:
-	PruManagerUio(unsigned int pruNum=0, unsigned int v=0);
+	PruManagerUio(unsigned int pruNum = 0, unsigned int v = 0);
 	int start();
 	void stop();
 	void* getOwnMemory();

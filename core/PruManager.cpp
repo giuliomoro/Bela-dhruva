@@ -16,11 +16,14 @@
 #define AM572x_Flag 0
 #endif
 
-PruManager::PruManager(){
+PruManager::PruManager()
+{
+	// Constructor might be of use later?
 }
 
 #ifdef ENABLE_PRU_RPROC1
-PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v){
+PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
+{
 	/* constructor for initializing the necessary path variables
 	 * based on the value of pru_num to choose:
 	 * 0 for PRU1 core 0
@@ -45,7 +48,7 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v){
 	// 1 : pruss1-core 1 in AI -> 4b238000
 	// 2 : pruss2-core 0 in AI -> 4b2b4000
 	// 3 : pruss2-core 1 in AI -> 4b2b8000
-	if(AM572x_Flag){
+	if(AM572x_Flag) {
 		pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4b234000));
 		pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4b238000));
 		pru_addr.insert(std::pair<unsigned int, unsigned int>(2,0x4b2b4000));
@@ -58,20 +61,23 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v){
 	long mem2 = 0x4b200000;
 }
 
-void PruManagerRprocMmap::readstate(){	//Reads the current state of PRU
+void PruManagerRprocMmap::readstate()
+{	//Reads the current state of PRU
 	std::string state = IoUtils::readTextFile(statePath);
 	if(verbose)
 		std::cout << "PRU state is: " << state << "\n";
 }
 
-void PruManagerRprocMmap::stop(){	//performs echo stop > state
+void PruManagerRprocMmap::stop()
+{	//performs echo stop > state
 	if(verbose)
 		std::cout << "Stopping the PRU1_0 \n";
 	//mode = TRUNCATE; by default
 	IoUtils::writeTextFile(statePath, "stop");
 }
 
-int PruManagerRprocMmap::start(){	// performs echo start > state
+int PruManagerRprocMmap::start()
+{	// performs echo start > state
 	if(verbose)
 		std::cout << "Starting the PRU1_0 \n";
 	//mode = TRUNCATE; by default
@@ -96,13 +102,15 @@ void* PruManagerRprocMmap::getSharedMemory()
 #endif
 
 #ifdef ENABLE_PRU_UIO1
-PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v){
+PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v)
+{
 	// nothing to do
 	pru_num = pruNum;
 	verbose = v;
 }
 
-int PruManagerUio::start(){
+int PruManagerUio::start()
+{
 	// prussdrv_init() I guess.
 	// prussdrv_exec_program(pru_num, *filename);	// Maybe define filename in constructor
 	prussdrv_init();
@@ -125,9 +133,9 @@ void* PruManagerUio::getOwnMemory()
 	void* pruDataRam;
 	int ret = prussdrv_map_prumem (pru_num == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
 	if(ret)
-	return NULL;
+		return NULL;
 	else
-	return pruDataRam;
+		return pruDataRam;
 }
 
 
@@ -136,8 +144,8 @@ void* PruManagerUio::getSharedMemory()
 	void* pruSharedRam;
 	int ret = prussdrv_map_prumem (PRUSS0_SHARED_DATARAM, (void **)&pruSharedRam);
 	if(ret)
-	return NULL;
+		return NULL;
 	else
-	return pruSharedRam;
+		return pruSharedRam;
 }
 #endif
