@@ -16,7 +16,7 @@
 #include "../include/PRU.h"
 #include "../include/PruBinary.h"
 
-#ifdef ENABLE_PRU_UIO1
+#if ENABLE_PRU_UIO == 1
 #include <prussdrv.h>
 #endif
 
@@ -226,10 +226,10 @@ PRU::PRU(InternalBelaContext *input_context)
   audio_expander_input_history(0), audio_expander_output_history(0),
   audio_expander_filter_coeff(0), pruUsesMcaspIrq(false), belaHw(BelaHw_NoHw)
 {
-#ifdef ENABLE_PRU_UIO1
+#if ENABLE_PRU_UIO == 1
 	prumanager = new PruManagerUio(pru_number, gRTAudioVerbose);
 #endif
-#ifdef ENABLE_PRU_RPROC1
+#if ENABLE_PRU_RPROC == 1
 	prumanager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
 #endif
 }
@@ -762,7 +762,7 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 	}
 
 	/* Load and execute binary on PRU */
-#ifdef ENABLE_PRU_UIO1
+#if ENABLE_PRU_UIO == 1
 	if(filename[0] == '\0') { //if the string is empty, load the embedded code
 		if(gRTAudioVerbose)
 			printf("Using embedded PRU code\n");
@@ -779,7 +779,7 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 		}
 	}
 #endif
-#ifdef ENABLE_PRU_RPROC1
+#if ENABLE_PRU_RPROC == 1
 // do something else probably? Or simply not required.
 #endif
 
@@ -1526,17 +1526,15 @@ void PRU::waitForFinish()
 void PRU::disable()
 {
     /* Disable PRU and close memory mapping*/
-    //  prussdrv_pru_disable(pru_number);
     prumanager->stop();
 	running = false;
 }
 
-// Exit the prussdrv subsystem (affects both PRUs)
+// Exit the pru subsystem
 void PRU::exitPRUSS()
 {
 	if(initialised)
 		delete prumanager;
-	    // prussdrv_exit();
 	initialised = false;
 }
 

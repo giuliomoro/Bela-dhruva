@@ -10,7 +10,7 @@
 
 #include <string>
 
-#ifdef ENABLE_PRU_UIO1
+#if ENABLE_PRU_UIO == 1
 #include <prussdrv.h>
 #endif
 
@@ -22,8 +22,9 @@ class PruManager
 // expose parameters for the relevant paths
 	public:
 	unsigned int pru_num, verbose;
+	std::string state;
 	PruManager();
-	// virtual void readstate() = 0;
+	virtual void readstate() = 0;
 	virtual int start() = 0;
 	virtual void stop() = 0;
 	virtual void* getOwnMemory() = 0;
@@ -31,7 +32,7 @@ class PruManager
 };
 
 
-#ifdef ENABLE_PRU_RPROC1
+#if ENABLE_PRU_RPROC == 1
 class PruManagerRprocMmap : public PruManager
 {
 /* use rproc for start/stop and mmap for memory sharing
@@ -45,7 +46,7 @@ public:
 	void* getSharedMemory();
 private:
 	std::map<unsigned int, unsigned int> pru_addr;	// prunum : pru address
-	int verbose = 0;
+	int verbose;
 	std::string basePath;
 	std::string statePath;
 	std::string firmwarePath;
@@ -55,9 +56,9 @@ private:
 	Mmap sharedMemory;
 	long mem2;
 };
-#endif
+#endif	// end condition for ENABLE_PRU_RPROC
 
-#ifdef ENABLE_PRU_UIO1
+#if ENABLE_PRU_UIO == 1
 class PruManagerUio : public PruManager
 {
 /* wrapper for libprussdrv for both start/stop and memory sharing
@@ -65,10 +66,13 @@ class PruManagerUio : public PruManager
 */
 public:
 	PruManagerUio(unsigned int pruNum = 0, unsigned int v = 0);
+	void readstate();
 	int start();
 	void stop();
 	void* getOwnMemory();
 	void* getSharedMemory();
+private:
+	unsigned int start_status;	// 0 for stopped and 1 for started
 };
 
-#endif
+#endif	// end condition for ENABLE_PRU_UIO

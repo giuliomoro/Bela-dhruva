@@ -10,18 +10,12 @@
 #include "MiscUtilities.h"
 #include <iostream>
 
-#ifdef IS_AM572x1
-#define AM572x_Flag 1
-#else
-#define AM572x_Flag 0
-#endif
-
 PruManager::PruManager()
 {
 	// Constructor might be of use later?
 }
 
-#ifdef ENABLE_PRU_RPROC1
+#if ENABLE_PRU_RPROC == 1
 PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 {
 	/* constructor for initializing the necessary path variables
@@ -41,29 +35,29 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	firmwarePath = basePath + "firmware";
 	firmware = "am57xx-pru" + std::to_string(pruss) + "_" + std::to_string(prucore) + "-fw";
 	firmwareCopyCommand = "sudo rm /lib/firmware/" + firmware + ";sudo ln -s /home/debian/Bela-dhruva/pru/blinkR30.pru1_0.out /lib/firmware/" + firmware; // **NOTE**: Change the name of .out file according afterwards here and below cases.
-	// ToDo: add base addresses to be used by Mmap
-	// 0 : pruss-core 0 in BBB -> 4a334000
-	// 1 : pruss-core 1 in BBB -> 4a338000
 	// 0 : pruss1-core 0 in AI -> 4b234000
 	// 1 : pruss1-core 1 in AI -> 4b238000
 	// 2 : pruss2-core 0 in AI -> 4b2b4000
 	// 3 : pruss2-core 1 in AI -> 4b2b8000
-	if(AM572x_Flag) {
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4b234000));
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4b238000));
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(2,0x4b2b4000));
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(3,0x4b2b8000));
-	}
-	else{
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4a334000));
-		pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4a338000));
-	}
-	long mem2 = 0x4b200000;
+	//
+	// 0 : pruss-core 0 in BBB -> 4a334000
+	// 1 : pruss-core 1 in BBB -> 4a338000
+
+#ifdef IS_AM572x	// base addresses for BBAI
+	pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4b234000));
+	pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4b238000));
+	pru_addr.insert(std::pair<unsigned int, unsigned int>(2,0x4b2b4000));
+	pru_addr.insert(std::pair<unsigned int, unsigned int>(3,0x4b2b8000));
+#else	// base addresses for BBB
+	pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4a334000));
+	pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4a338000));
+#endif
+	long addr2 = 0x4b200000;
 }
 
 void PruManagerRprocMmap::readstate()
 {	//Reads the current state of PRU
-	std::string state = IoUtils::readTextFile(statePath);
+	state = IoUtils::readTextFile(statePath);
 	if(verbose)
 		std::cout << "PRU state is: " << state << "\n";
 }
@@ -77,17 +71,19 @@ void PruManagerRprocMmap::stop()
 }
 
 int PruManagerRprocMmap::start()
-{	// performs echo start > state
-	if(verbose)
-		std::cout << "Starting the PRU1_0 \n";
-	//mode = TRUNCATE; by default
-	IoUtils::writeTextFile(statePath, "start");
+{
+	stop();
 	system(firmwareCopyCommand.c_str());	// copies fw to /lib/am57xx-fw
 	if(verbose)
 		std::cout << "Loading firmware into the PRU1_0 \n";
 	//mode = TRUNCATE; by default
 	IoUtils::writeTextFile(firmwarePath,firmware);	// reload the new fw in PRU
-
+	// performs echo start > state
+	if(verbose)
+		std::cout << "Starting the PRU1_0 \n";
+	//mode = TRUNCATE; by default
+	IoUtils::writeTextFile(statePath, "start");
+	return 0;	// TODO: If system returns any error then detect it and then return 1 instead
 }
 
 void* PruManagerRprocMmap::getOwnMemory()
@@ -99,14 +95,22 @@ void* PruManagerRprocMmap::getSharedMemory()
 {
 	return sharedMemory.map(addr2, 0x3000);	// addr2 is the address of the start of PRUSS Shared RAM
 }
-#endif
+#endif	// for ENABLE_PRU_RPROC
 
-#ifdef ENABLE_PRU_UIO1
+#if ENABLE_PRU_UIO == 1
 PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v)
 {
 	// nothing to do
 	pru_num = pruNum;
 	verbose = v;
+	start_status = 0;
+}
+
+void PruManagerUio::readstate()
+{
+	state = ((start_status == 1) ? "running" : "stopped");
+	if(verbose)
+		std::cout << "PRU state is: " << state << "\n";
 }
 
 int PruManagerUio::start()
@@ -118,6 +122,7 @@ int PruManagerUio::start()
 		fprintf(stderr, "Failed to open PRU driver\n");
 		return 1;
 	}
+	start_status = 1;	// keeps an internal flag that the PRU is running
 	return 0;
 }
 
@@ -125,6 +130,7 @@ void PruManagerUio::stop(){
 	// prussdrv_stop() equivalent
 	if(verbose)
 		std::cout << "Stopping the PRU \n";
+	start_status = 0;
 	prussdrv_pru_disable(pru_num);
 }
 
@@ -148,4 +154,4 @@ void* PruManagerUio::getSharedMemory()
 	else
 		return pruSharedRam;
 }
-#endif
+#endif	// for ENABLE_PRU_UIO
