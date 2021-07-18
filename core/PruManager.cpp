@@ -66,7 +66,6 @@ void PruManagerRprocMmap::stop()
 {	//performs echo stop > state
 	if(verbose)
 		std::cout << "Stopping the PRU1_0 \n";
-	//mode = TRUNCATE; by default
 	IoUtils::writeTextFile(statePath, "stop");
 }
 
@@ -76,12 +75,10 @@ int PruManagerRprocMmap::start()
 	system(firmwareCopyCommand.c_str());	// copies fw to /lib/am57xx-fw
 	if(verbose)
 		std::cout << "Loading firmware into the PRU1_0 \n";
-	//mode = TRUNCATE; by default
 	IoUtils::writeTextFile(firmwarePath,firmware);	// reload the new fw in PRU
 	// performs echo start > state
 	if(verbose)
 		std::cout << "Starting the PRU1_0 \n";
-	//mode = TRUNCATE; by default
 	IoUtils::writeTextFile(statePath, "start");
 	return 0;	// TODO: If system returns any error then detect it and then return 1 instead
 }
@@ -127,7 +124,6 @@ int PruManagerUio::start()
 }
 
 void PruManagerUio::stop(){
-	// prussdrv_stop() equivalent
 	if(verbose)
 		std::cout << "Stopping the PRU \n";
 	start_status = 0;

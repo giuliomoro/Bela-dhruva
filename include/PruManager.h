@@ -1,8 +1,8 @@
-/* 
+/*
  * PruManager.h
  *
- * includes the classes required for introducing RProc functionality
- * but at the same time still support Mmap and libprussdrv
+ * Support for interaction with PRU via
+ * (rproc+mmap) and/or (uio+libprussdrv)
  *
  *	Created on: Jul 3, 2021
  *		Author: Dhruva Gole
@@ -35,8 +35,7 @@ class PruManager
 #if ENABLE_PRU_RPROC == 1
 class PruManagerRprocMmap : public PruManager
 {
-/* use rproc for start/stop and mmap for memory sharing
- */
+// use rproc for start/stop and mmap for memory sharing
 public:
 	PruManagerRprocMmap(unsigned int pruNum = 0, unsigned int v = 0);
 	void readstate();
@@ -56,7 +55,7 @@ private:
 	Mmap sharedMemory;
 	long mem2;
 };
-#endif	// end condition for ENABLE_PRU_RPROC
+#endif	// ENABLE_PRU_RPROC
 
 #if ENABLE_PRU_UIO == 1
 class PruManagerUio : public PruManager
@@ -75,4 +74,4 @@ private:
 	unsigned int start_status;	// 0 for stopped and 1 for started
 };
 
-#endif	// end condition for ENABLE_PRU_UIO
+#endif	// ENABLE_PRU_UIO
