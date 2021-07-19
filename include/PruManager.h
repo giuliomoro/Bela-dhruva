@@ -20,11 +20,9 @@
 class PruManager
 {
 // expose parameters for the relevant paths
-	public:
+public:
 	unsigned int pru_num, verbose;
-	std::string state;
 	PruManager();
-	virtual void readstate() = 0;
 	virtual int start() = 0;
 	virtual void stop() = 0;
 	virtual void* getOwnMemory() = 0;
@@ -38,7 +36,6 @@ class PruManagerRprocMmap : public PruManager
 // use rproc for start/stop and mmap for memory sharing
 public:
 	PruManagerRprocMmap(unsigned int pruNum = 0, unsigned int v = 0);
-	void readstate();
 	void stop();
 	int start();
 	void* getOwnMemory();
@@ -65,13 +62,11 @@ class PruManagerUio : public PruManager
 */
 public:
 	PruManagerUio(unsigned int pruNum = 0, unsigned int v = 0);
-	void readstate();
 	int start();
 	void stop();
 	void* getOwnMemory();
 	void* getSharedMemory();
 private:
-	unsigned int start_status;	// 0 for stopped and 1 for started
 };
 
 #endif	// ENABLE_PRU_UIO

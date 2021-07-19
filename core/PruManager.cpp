@@ -10,11 +10,6 @@
 #include "MiscUtilities.h"
 #include <iostream>
 
-PruManager::PruManager()
-{
-	// Constructor might be of use later?
-}
-
 #if ENABLE_PRU_RPROC == 1
 PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 {
@@ -53,13 +48,6 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4a338000));
 #endif
 	long addr2 = 0x4b200000;
-}
-
-void PruManagerRprocMmap::readstate()
-{	//Reads the current state of PRU
-	state = IoUtils::readTextFile(statePath);
-	if(verbose)
-		std::cout << "PRU state is: " << state << "\n";
 }
 
 void PruManagerRprocMmap::stop()
@@ -103,30 +91,20 @@ PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v)
 	start_status = 0;
 }
 
-void PruManagerUio::readstate()
-{
-	state = ((start_status == 1) ? "running" : "stopped");
-	if(verbose)
-		std::cout << "PRU state is: " << state << "\n";
-}
-
 int PruManagerUio::start()
 {
-	// prussdrv_init() I guess.
 	// prussdrv_exec_program(pru_num, *filename);	// Maybe define filename in constructor
 	prussdrv_init();
 	if(prussdrv_open(PRU_EVTOUT_0)) {
 		fprintf(stderr, "Failed to open PRU driver\n");
 		return 1;
 	}
-	start_status = 1;	// keeps an internal flag that the PRU is running
 	return 0;
 }
 
 void PruManagerUio::stop(){
 	if(verbose)
 		std::cout << "Stopping the PRU \n";
-	start_status = 0;
 	prussdrv_pru_disable(pru_num);
 }
 
