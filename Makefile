@@ -294,19 +294,19 @@ ifeq ($(XENOMAI_VERSION),3)
   BELA_USE_DEFINE=BELA_USE_RTDM
 endif
 
-IS_AM572x = $(shell grep -q AI /proc/device-tree/model && echo '-DIS_AM572x' || echo ' ')
+IS_AM572x = $(shell grep -q AI /proc/device-tree/model && echo '-DIS_AM572x')
 
 ifeq ($(AT),)
-	$(info  AI flag = $(IS_AM572x))
+  $(info  AI flag = $(IS_AM572x))
 endif
 
 #	Flag for using/ not using (UIO+prussdrv)/(RPROC+Mmap)
 ifneq (,$(findstring IS,$(IS_AM572x)))
-	ENABLE_PRU_UIO = 0
-	ENABLE_PRU_RPROC = 1
+  ENABLE_PRU_UIO = 0
+  ENABLE_PRU_RPROC = 1
 else
-	ENABLE_PRU_UIO = 1
-	ENABLE_PRU_RPROC = 0
+  ENABLE_PRU_UIO = 1
+  ENABLE_PRU_RPROC = 0
 endif
 
 DEFAULT_COMMON_FLAGS := $(DEFAULT_XENOMAI_CFLAGS) -O3 -g -march=armv7-a -mtune=cortex-a8 -mfloat-abi=hard -mfpu=neon -ftree-vectorize -ffast-math -DNDEBUG -D$(BELA_USE_DEFINE) -I$(BASE_DIR)/resources/$(DEBIAN_VERSION)/include -save-temps=obj $(IS_AM572x) -DENABLE_PRU_UIO=$(ENABLE_PRU_UIO) -DENABLE_PRU_RPROC=$(ENABLE_PRU_RPROC)
