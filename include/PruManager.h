@@ -22,7 +22,6 @@ class PruManager
 // expose parameters for the relevant paths
 public:
 	unsigned int pru_num, verbose;
-	PruManager();
 	virtual int start() = 0;
 	virtual void stop() = 0;
 	virtual void* getOwnMemory() = 0;

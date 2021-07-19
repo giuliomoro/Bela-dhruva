@@ -88,7 +88,6 @@ PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v)
 	// nothing to do
 	pru_num = pruNum;
 	verbose = v;
-	start_status = 0;
 }
 
 int PruManagerUio::start()
