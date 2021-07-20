@@ -179,7 +179,7 @@ public:
 	// Exit the whole PRU subsystem
 	void exitPRUSS();
 
-	PruManager *prumanager;
+	PruManager *pruManager;
 
 private:
 	void initialisePruCommon(const McaspRegisters& mcaspRegisters);

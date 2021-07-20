@@ -101,10 +101,10 @@ extern int gRTAudioVerbose;
 class PruMemory
 {
 public:
-	PruMemory(int pruNumber, InternalBelaContext* newContext, PruManager& prumanager) :
+	PruMemory(int pruNumber, InternalBelaContext* newContext, PruManager& pruManager) :
 		context(newContext)
 	{
-		pruSharedRam = static_cast<char*>(prumanager.getSharedMemory());
+		pruSharedRam = static_cast<char*>(pruManager.getSharedMemory());
 		audioIn.resize(context->audioInChannels * context->audioFrames);
 		audioOut.resize(context->audioOutChannels * context->audioFrames);
 		digital.resize(context->digitalFrames);
@@ -116,7 +116,7 @@ public:
 		pruDigitalStart[1] = pruSharedRam + PRU_MEM_DIGITAL_OFFSET + PRU_MEM_DIGITAL_BUFFER1_OFFSET;
 		if(context->analogFrames > 0)
 		{
-			pruDataRam = static_cast<char*>(prumanager.getOwnMemory());
+			pruDataRam = static_cast<char*>(pruManager.getOwnMemory());
 			analogOut.resize(context->analogOutChannels * context->analogFrames);
 			analogIn.resize(context->analogInChannels * context->analogFrames);
 			pruAnalogOutStart[0] = pruDataRam + PRU_MEM_DAC_OFFSET;
@@ -227,10 +227,10 @@ PRU::PRU(InternalBelaContext *input_context)
   audio_expander_filter_coeff(0), pruUsesMcaspIrq(false), belaHw(BelaHw_NoHw)
 {
 #if ENABLE_PRU_UIO == 1
-	prumanager = new PruManagerUio(pru_number, gRTAudioVerbose);
+	pruManager = new PruManagerUio(pru_number, gRTAudioVerbose);
 #endif
 #if ENABLE_PRU_RPROC == 1
-	prumanager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
+	pruManager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
 #endif
 }
 
@@ -395,8 +395,8 @@ int PRU::initialise(BelaHw newBelaHw, int pru_num, bool uniformSampleRate, int m
 
 	/* Allocate and initialize memory */
 
-	prumanager->start();
-	pruMemory = new PruMemory(pru_number, context, *prumanager);
+	pruManager->start();
+	pruMemory = new PruMemory(pru_number, context, *pruManager);
 
 	if(0 <= stopButtonPin){
 		stopButton.open(stopButtonPin, Gpio::INPUT, false);
@@ -1526,7 +1526,7 @@ void PRU::waitForFinish()
 void PRU::disable()
 {
     /* Disable PRU and close memory mapping*/
-    prumanager->stop();
+    pruManager->stop();
 	running = false;
 }
 
@@ -1534,7 +1534,7 @@ void PRU::disable()
 void PRU::exitPRUSS()
 {
 	if(initialised)
-		delete prumanager;
+		delete pruManager;
 	initialised = false;
 }
 
