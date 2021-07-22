@@ -228,10 +228,10 @@ PRU::PRU(InternalBelaContext *input_context)
 {
 #if ENABLE_PRU_UIO == 1
 	pruManager = new PruManagerUio(pru_number, gRTAudioVerbose);
-#endif
+#endif	// ENABLE_PRU_UIO
 #if ENABLE_PRU_RPROC == 1
 	pruManager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
-#endif
+#endif	// ENABLE_PRU_UIO
 }
 
 // Destructor
@@ -778,10 +778,10 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 			return 1;
 		}
 	}
-#endif
+#endif	// ENABLE_PRU_UIO
 #if ENABLE_PRU_RPROC == 1
 // do something else probably? Or simply not required.
-#endif
+#endif	// ENABLE_PRU_RPROC
 
 	running = true;
 	return 0;
