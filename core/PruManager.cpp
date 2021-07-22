@@ -57,7 +57,7 @@ void PruManagerRprocMmap::stop()
 	IoUtils::writeTextFile(statePath, "stop");
 }
 
-int PruManagerRprocMmap::start()
+int PruManagerRprocMmap::start(const char* path)
 {
 	stop();
 	system(firmwareCopyCommand.c_str());	// copies fw to /lib/am57xx-fw
@@ -83,22 +83,41 @@ void* PruManagerRprocMmap::getSharedMemory()
 #endif	// for ENABLE_PRU_RPROC
 
 #if ENABLE_PRU_UIO == 1
+#include "../include/PruBinary.h"
+
 PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v)
 {
 	// nothing to do
 	pru_num = pruNum;
 	verbose = v;
-}
-
-int PruManagerUio::start()
-{
-	// prussdrv_exec_program(pru_num, *filename);	// Maybe define filename in constructor
 	prussdrv_init();
 	if(prussdrv_open(PRU_EVTOUT_0)) {
 		fprintf(stderr, "Failed to open PRU driver\n");
-		return 1;
 	}
-	return 0;
+
+}
+
+int PruManagerUio::start(const char* path)
+{
+	if(path[0] == '\0') {
+		unsigned int* pruCode;
+		unsigned int pruCodeSize;
+		pruCode = (unsigned int*)IrqPruCode::getBinary();
+		pruCodeSize = IrqPruCode::getBinarySize();
+		if(prussdrv_exec_code(pru_num, pruCode, pruCodeSize)) {
+			fprintf(stderr, "Failed to execute PRU code\n");
+			return 0;
+		}
+		else
+			return 1;
+	}
+	else {
+		if(prussdrv_exec_program(pru_num, path)) {
+			return 0;
+		}
+		else
+			return 1;
+	}
 }
 
 void PruManagerUio::stop(){

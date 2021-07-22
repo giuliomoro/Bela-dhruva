@@ -226,12 +226,14 @@ PRU::PRU(InternalBelaContext *input_context)
   audio_expander_input_history(0), audio_expander_output_history(0),
   audio_expander_filter_coeff(0), pruUsesMcaspIrq(false), belaHw(BelaHw_NoHw)
 {
+	/*
 #if ENABLE_PRU_UIO == 1
 	pruManager = new PruManagerUio(pru_number, gRTAudioVerbose);
 #endif	// ENABLE_PRU_UIO
 #if ENABLE_PRU_RPROC == 1
 	pruManager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
 #endif	// ENABLE_PRU_UIO
+*/ 
 }
 
 // Destructor
@@ -394,8 +396,14 @@ int PRU::initialise(BelaHw newBelaHw, int pru_num, bool uniformSampleRate, int m
 	pru_number = pru_num;
 
 	/* Allocate and initialize memory */
+#if ENABLE_PRU_UIO == 1
+	pruManager = new PruManagerUio(pru_number, gRTAudioVerbose);
+#endif	// ENABLE_PRU_UIO
+#if ENABLE_PRU_RPROC == 1
+	pruManager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
+#endif	// ENABLE_PRU_UIO
 
-	pruManager->start();
+	// pruManager->start();
 	pruMemory = new PruMemory(pru_number, context, *pruManager);
 
 	if(0 <= stopButtonPin){
@@ -763,6 +771,7 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 
 	/* Load and execute binary on PRU */
 #if ENABLE_PRU_UIO == 1
+/*
 	if(filename[0] == '\0') { //if the string is empty, load the embedded code
 		if(gRTAudioVerbose)
 			printf("Using embedded PRU code\n");
@@ -778,6 +787,14 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 			return 1;
 		}
 	}
+*/
+	if(gRTAudioVerbose)
+		printf("Using %s PRU code\n", 0 == strlen(filename) ? "embedded" : filename);
+	if(!pruManager->start(filename)) {
+		fprintf(stderr, "Failed to execute PRU code\n");
+		return 1;
+	}
+
 #endif	// ENABLE_PRU_UIO
 #if ENABLE_PRU_RPROC == 1
 // do something else probably? Or simply not required.
