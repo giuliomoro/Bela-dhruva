@@ -106,17 +106,17 @@ int PruManagerUio::start(const char* path)
 		pruCodeSize = IrqPruCode::getBinarySize();
 		if(prussdrv_exec_code(pru_num, pruCode, pruCodeSize)) {
 			fprintf(stderr, "Failed to execute PRU code\n");
-			return 0;
+			return 1;
 		}
 		else
-			return 1;
+			return 0;
 	}
 	else {
 		if(prussdrv_exec_program(pru_num, path)) {
-			return 0;
+			return 1;
 		}
 		else
-			return 1;
+			return 0;
 	}
 }
 
