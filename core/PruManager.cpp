@@ -53,7 +53,7 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 void PruManagerRprocMmap::stop()
 {	//performs echo stop > state
 	if(verbose)
-		std::cout << "Stopping the PRU1_0 \n";
+		std::cout << "Stopping the PRU" << std::to_string(pruss) + "_" + std::to_string(prucore) << "\n";
 	IoUtils::writeTextFile(statePath, "stop");
 }
 
@@ -62,11 +62,11 @@ int PruManagerRprocMmap::start(const char* path)
 	stop();
 	system(firmwareCopyCommand.c_str());	// copies fw to /lib/am57xx-fw
 	if(verbose)
-		std::cout << "Loading firmware into the PRU1_0 \n";
+		std::cout << "Loading firmware into the PRU" << std::to_string(pruss) + "_" + std::to_string(prucore) << "\n";
 	IoUtils::writeTextFile(firmwarePath,firmware);	// reload the new fw in PRU
 	// performs echo start > state
 	if(verbose)
-		std::cout << "Starting the PRU1_0 \n";
+		std::cout << "Starting the PRU" << std::to_string(pruss) + "_" + std::to_string(prucore) << "\n";
 	IoUtils::writeTextFile(statePath, "start");
 	return 0;	// TODO: If system returns any error then detect it and then return 1 instead
 }
@@ -122,7 +122,7 @@ int PruManagerUio::start(const char* path)
 
 void PruManagerUio::stop(){
 	if(verbose)
-		std::cout << "Stopping the PRU \n";
+		std::cout << "Stopping the PRU" << pru_num << "\n";
 	prussdrv_pru_disable(pru_num);
 }
 
