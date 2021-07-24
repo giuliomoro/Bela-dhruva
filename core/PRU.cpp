@@ -226,14 +226,6 @@ PRU::PRU(InternalBelaContext *input_context)
   audio_expander_input_history(0), audio_expander_output_history(0),
   audio_expander_filter_coeff(0), pruUsesMcaspIrq(false), belaHw(BelaHw_NoHw)
 {
-	/*
-#if ENABLE_PRU_UIO == 1
-	pruManager = new PruManagerUio(pru_number, gRTAudioVerbose);
-#endif	// ENABLE_PRU_UIO
-#if ENABLE_PRU_RPROC == 1
-	pruManager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
-#endif	// ENABLE_PRU_UIO
-*/
 }
 
 // Destructor
