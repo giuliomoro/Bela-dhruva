@@ -41,15 +41,18 @@ public:
 	void* getSharedMemory();
 private:
 	std::map<unsigned int, unsigned int> pru_addr;	// prunum : pru address
-	int verbose;
+	std::map<unsigned int, unsigned int> pruss_addr;	// prunum : pru sub-system address
 	std::string basePath;
 	std::string statePath;
 	std::string firmwarePath;
 	std::string firmware;
 	std::string firmwareCopyCommand;
+	unsigned int pru_num;
+	unsigned int verbose;
+	unsigned int pruss;
+	unsigned int prucore;
 	Mmap ownMemory;
 	Mmap sharedMemory;
-	long mem2;
 };
 #endif	// ENABLE_PRU_RPROC
 

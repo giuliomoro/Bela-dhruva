@@ -233,7 +233,7 @@ PRU::PRU(InternalBelaContext *input_context)
 #if ENABLE_PRU_RPROC == 1
 	pruManager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
 #endif	// ENABLE_PRU_UIO
-*/ 
+*/
 }
 
 // Destructor

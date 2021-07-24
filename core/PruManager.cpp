@@ -29,29 +29,37 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	statePath = basePath + "state";
 	firmwarePath = basePath + "firmware";
 	firmware = "am57xx-pru" + std::to_string(pruss) + "_" + std::to_string(prucore) + "-fw";
-	firmwareCopyCommand = "sudo rm /lib/firmware/" + firmware + ";sudo ln -s /home/debian/Bela-dhruva/pru/blinkR30.pru1_0.out /lib/firmware/" + firmware; // **NOTE**: Change the name of .out file according afterwards here and below cases.
-	// 0 : pruss1-core 0 in AI -> 4b234000
-	// 1 : pruss1-core 1 in AI -> 4b238000
-	// 2 : pruss2-core 0 in AI -> 4b2b4000
-	// 3 : pruss2-core 1 in AI -> 4b2b8000
+# ifdef firmwareBelaRProc
+	std::string firmwareBela = firmwareBelaRProc;	// Incoming string from Makefile
+# endif	// firmwareBelaRProc
+	firmwareCopyCommand = "sudo ln -s -f " + firmwareBela + " /lib/firmware/" + firmware; // Pass the name of custom .out file via Makefile using firmwareBelaRProc=<path to file>
+	// 0 : pru1-core 0 in AI -> 4b234000
+	// 1 : pru1-core 1 in AI -> 4b238000
+	// 2 : pru2-core 0 in AI -> 4b2b4000
+	// 3 : pru2-core 1 in AI -> 4b2b8000
 	//
-	// 0 : pruss-core 0 in BBB -> 4a334000
-	// 1 : pruss-core 1 in BBB -> 4a338000
+	// 1 : PRUSS address in AI for PRU 1
+	// 2 : PRUSS address in AI for PRU 2
+	//
+	// 0 : pru-core 0 in BBB -> 4a334000
+	// 1 : pru-core 1 in BBB -> 4a338000
 
-#ifdef IS_AM572x	// base addresses for BBAI
+# ifdef IS_AM572x	// base addresses for BBAI
 	pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4b234000));
 	pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4b238000));
 	pru_addr.insert(std::pair<unsigned int, unsigned int>(2,0x4b2b4000));
 	pru_addr.insert(std::pair<unsigned int, unsigned int>(3,0x4b2b8000));
-#else	// base addresses for BBB
+
+	pruss_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4b200000));
+	pruss_addr.insert(std::pair<unsigned int, unsigned int>(2,0x4b280000));
+# else	// base addresses for BBB
 	pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4a334000));
 	pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4a338000));
-#endif
-	long addr2 = 0x4b200000;
+# endif	// IS_AM572x
 }
 
 void PruManagerRprocMmap::stop()
-{	//performs echo stop > state
+{	// performs echo stop > state
 	if(verbose)
 		std::cout << "Stopping the PRU" << std::to_string(pruss) + "_" + std::to_string(prucore) << "\n";
 	IoUtils::writeTextFile(statePath, "stop");
@@ -78,9 +86,9 @@ void* PruManagerRprocMmap::getOwnMemory()
 
 void* PruManagerRprocMmap::getSharedMemory()
 {
-	return sharedMemory.map(addr2, 0x3000);	// addr2 is the address of the start of PRUSS Shared RAM
+	return sharedMemory.map(pruss_addr[pruss], 0x8000);
 }
-#endif	// for ENABLE_PRU_RPROC
+#endif	// ENABLE_PRU_RPROC
 
 #if ENABLE_PRU_UIO == 1
 #include "../include/PruBinary.h"
