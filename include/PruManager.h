@@ -22,7 +22,7 @@ class PruManager
 // expose parameters for the relevant paths
 public:
 	unsigned int pru_num, verbose;
-	virtual int start(const char* path) = 0;
+	virtual int start(const std::string& path) = 0;
 	virtual void stop() = 0;
 	virtual void* getOwnMemory() = 0;
 	virtual void* getSharedMemory() = 0;
@@ -36,7 +36,7 @@ class PruManagerRprocMmap : public PruManager
 public:
 	PruManagerRprocMmap(unsigned int pruNum = 0, unsigned int v = 0);
 	void stop();
-	int start(const char* path);
+	int start(const std::string& path);
 	void* getOwnMemory();
 	void* getSharedMemory();
 private:
@@ -64,7 +64,7 @@ class PruManagerUio : public PruManager
 */
 public:
 	PruManagerUio(unsigned int pruNum = 0, unsigned int v = 0);
-	int start(const char* path);
+	int start(const std::string& path);
 	void stop();
 	void* getOwnMemory();
 	void* getSharedMemory();
