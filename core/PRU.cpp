@@ -233,7 +233,7 @@ PRU::PRU(InternalBelaContext *input_context)
 #if ENABLE_PRU_RPROC == 1
 	pruManager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
 #endif	// ENABLE_PRU_UIO
-*/ 
+*/
 }
 
 // Destructor
@@ -771,26 +771,9 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 
 	/* Load and execute binary on PRU */
 #if ENABLE_PRU_UIO == 1
-/*
-	if(filename[0] == '\0') { //if the string is empty, load the embedded code
-		if(gRTAudioVerbose)
-			printf("Using embedded PRU code\n");
-		if(prussdrv_exec_code(pru_number, pruCode, pruCodeSize)) {
-			fprintf(stderr, "Failed to execute PRU code\n");
-			return 1;
-		}
-	} else {
-		if(gRTAudioVerbose)
-			printf("Using PRU code from %s\n",filename);
-		if(prussdrv_exec_program(pru_number, filename)) {
-			fprintf(stderr, "Failed to execute PRU code from %s\n", filename);
-			return 1;
-		}
-	}
-*/
 	if(gRTAudioVerbose)
 		printf("Using %s PRU code\n", 0 == strlen(filename) ? "embedded" : filename);
-	if(!pruManager->start(filename)) {
+	if(pruManager->start(filename)) {
 		fprintf(stderr, "Failed to execute PRU code\n");
 		return 1;
 	}
