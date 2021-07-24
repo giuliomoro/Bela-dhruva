@@ -94,7 +94,6 @@ void* PruManagerRprocMmap::getSharedMemory()
 
 PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v)
 {
-	// nothing to do
 	pru_num = pruNum;
 	verbose = v;
 	prussdrv_init();
@@ -154,4 +153,4 @@ void* PruManagerUio::getSharedMemory()
 	else
 		return pruSharedRam;
 }
-#endif	// for ENABLE_PRU_UIO
+#endif	// ENABLE_PRU_UIO
