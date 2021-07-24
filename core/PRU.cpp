@@ -16,7 +16,7 @@
 #include "../include/PRU.h"
 #include "../include/PruBinary.h"
 
-#ifdef ENABLE_PRU_UIO1
+#if ENABLE_PRU_UIO == 1
 #include <prussdrv.h>
 #endif
 
@@ -101,10 +101,10 @@ extern int gRTAudioVerbose;
 class PruMemory
 {
 public:
-	PruMemory(int pruNumber, InternalBelaContext* newContext, PruManager& prumanager) :
+	PruMemory(int pruNumber, InternalBelaContext* newContext, PruManager& pruManager) :
 		context(newContext)
 	{
-		pruSharedRam = static_cast<char*>(prumanager.getSharedMemory());
+		pruSharedRam = static_cast<char*>(pruManager.getSharedMemory());
 		audioIn.resize(context->audioInChannels * context->audioFrames);
 		audioOut.resize(context->audioOutChannels * context->audioFrames);
 		digital.resize(context->digitalFrames);
@@ -116,7 +116,7 @@ public:
 		pruDigitalStart[1] = pruSharedRam + PRU_MEM_DIGITAL_OFFSET + PRU_MEM_DIGITAL_BUFFER1_OFFSET;
 		if(context->analogFrames > 0)
 		{
-			pruDataRam = static_cast<char*>(prumanager.getOwnMemory());
+			pruDataRam = static_cast<char*>(pruManager.getOwnMemory());
 			analogOut.resize(context->analogOutChannels * context->analogFrames);
 			analogIn.resize(context->analogInChannels * context->analogFrames);
 			pruAnalogOutStart[0] = pruDataRam + PRU_MEM_DAC_OFFSET;
@@ -226,12 +226,14 @@ PRU::PRU(InternalBelaContext *input_context)
   audio_expander_input_history(0), audio_expander_output_history(0),
   audio_expander_filter_coeff(0), pruUsesMcaspIrq(false), belaHw(BelaHw_NoHw)
 {
-#ifdef ENABLE_PRU_UIO1
-	prumanager = new PruManagerUio(pru_number, gRTAudioVerbose);
-#endif
-#ifdef ENABLE_PRU_RPROC1
-	prumanager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
-#endif
+	/*
+#if ENABLE_PRU_UIO == 1
+	pruManager = new PruManagerUio(pru_number, gRTAudioVerbose);
+#endif	// ENABLE_PRU_UIO
+#if ENABLE_PRU_RPROC == 1
+	pruManager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
+#endif	// ENABLE_PRU_UIO
+*/ 
 }
 
 // Destructor
@@ -394,9 +396,15 @@ int PRU::initialise(BelaHw newBelaHw, int pru_num, bool uniformSampleRate, int m
 	pru_number = pru_num;
 
 	/* Allocate and initialize memory */
+#if ENABLE_PRU_UIO == 1
+	pruManager = new PruManagerUio(pru_number, gRTAudioVerbose);
+#endif	// ENABLE_PRU_UIO
+#if ENABLE_PRU_RPROC == 1
+	pruManager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
+#endif	// ENABLE_PRU_UIO
 
-	prumanager->start();
-	pruMemory = new PruMemory(pru_number, context, *prumanager);
+	// pruManager->start();
+	pruMemory = new PruMemory(pru_number, context, *pruManager);
 
 	if(0 <= stopButtonPin){
 		stopButton.open(stopButtonPin, Gpio::INPUT, false);
@@ -762,7 +770,8 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 	}
 
 	/* Load and execute binary on PRU */
-#ifdef ENABLE_PRU_UIO1
+#if ENABLE_PRU_UIO == 1
+/*
 	if(filename[0] == '\0') { //if the string is empty, load the embedded code
 		if(gRTAudioVerbose)
 			printf("Using embedded PRU code\n");
@@ -778,10 +787,18 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 			return 1;
 		}
 	}
-#endif
-#ifdef ENABLE_PRU_RPROC1
+*/
+	if(gRTAudioVerbose)
+		printf("Using %s PRU code\n", 0 == strlen(filename) ? "embedded" : filename);
+	if(!pruManager->start(filename)) {
+		fprintf(stderr, "Failed to execute PRU code\n");
+		return 1;
+	}
+
+#endif	// ENABLE_PRU_UIO
+#if ENABLE_PRU_RPROC == 1
 // do something else probably? Or simply not required.
-#endif
+#endif	// ENABLE_PRU_RPROC
 
 	running = true;
 	return 0;
@@ -1526,17 +1543,15 @@ void PRU::waitForFinish()
 void PRU::disable()
 {
     /* Disable PRU and close memory mapping*/
-    //  prussdrv_pru_disable(pru_number);
-    prumanager->stop();
+    pruManager->stop();
 	running = false;
 }
 
-// Exit the prussdrv subsystem (affects both PRUs)
+// Exit the pru subsystem
 void PRU::exitPRUSS()
 {
 	if(initialised)
-		delete prumanager;
-	    // prussdrv_exit();
+		delete pruManager;
 	initialised = false;
 }
 
