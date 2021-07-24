@@ -1,6 +1,5 @@
 /*
  * PruManager.cpp
- * This code currently only works on BBAI
  *
  *	Created on: July 3, 2021
  *		Author: Dhruva Gole
@@ -65,7 +64,7 @@ void PruManagerRprocMmap::stop()
 	IoUtils::writeTextFile(statePath, "stop");
 }
 
-int PruManagerRprocMmap::start(const char* path)
+int PruManagerRprocMmap::start(const std::string& path)
 {
 	stop();
 	system(firmwareCopyCommand.c_str());	// copies fw to /lib/am57xx-fw
@@ -104,8 +103,9 @@ PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v)
 
 }
 
-int PruManagerUio::start(const char* path)
+int PruManagerUio::start(const std::string& Path)
 {
+	const char *path = Path.c_str();
 	if(path[0] == '\0') {
 		unsigned int* pruCode;
 		unsigned int pruCodeSize;
