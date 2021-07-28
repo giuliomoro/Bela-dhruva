@@ -5,7 +5,7 @@
  *		Author: Dhruva Gole
  */
 
-#include "../include/PruManager.h"
+#include "PruManager.h"
 #include "MiscUtilities.h"
 #include <iostream>
 
