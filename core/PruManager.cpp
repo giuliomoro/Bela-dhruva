@@ -30,8 +30,10 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	firmware = "am57xx-pru" + std::to_string(pruss) + "_" + std::to_string(prucore) + "-fw";
 # ifdef firmwareBelaRProc
 	std::string firmwareBela = firmwareBelaRProc;	// Incoming string from Makefile
+# else
+# error No Firmware File Found!! Pass the name of firmware.out file using firmwareBelaRProc=<path to file>
 # endif	// firmwareBelaRProc
-	firmwareCopyCommand = "sudo ln -s -f " + firmwareBela + " /lib/firmware/" + firmware; // Pass the name of custom .out file via Makefile using firmwareBelaRProc=<path to file>
+	firmwareCopyCommand = "sudo ln -s -f " + firmwareBela + " /lib/firmware/" + firmware;
 	// 0 : pru1-core 0 in AI -> 4b234000
 	// 1 : pru1-core 1 in AI -> 4b238000
 	// 2 : pru2-core 0 in AI -> 4b2b4000
