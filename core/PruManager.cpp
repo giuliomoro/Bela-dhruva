@@ -46,16 +46,16 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	// 1 : pru-core 1 in BBB -> 4a338000
 
 # ifdef IS_AM572x	// base addresses for BBAI
-	pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4b234000));
-	pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4b238000));
-	pru_addr.insert(std::pair<unsigned int, unsigned int>(2,0x4b2b4000));
-	pru_addr.insert(std::pair<unsigned int, unsigned int>(3,0x4b2b8000));
+	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(0, 0x4b234000));
+	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4b238000));
+	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b2b4000));
+	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(3, 0x4b2b8000));
 
-	pruss_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4b200000));
-	pruss_addr.insert(std::pair<unsigned int, unsigned int>(2,0x4b280000));
+	sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4b200000));
+	sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b280000));
 # else	// base addresses for BBB
-	pru_addr.insert(std::pair<unsigned int, unsigned int>(0,0x4a334000));
-	pru_addr.insert(std::pair<unsigned int, unsigned int>(1,0x4a338000));
+	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(0, 0x4a334000));
+	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4a338000));
 # endif	// IS_AM572x
 }
 
@@ -72,7 +72,7 @@ int PruManagerRprocMmap::start(const std::string& path)
 	system(firmwareCopyCommand.c_str());	// copies fw to /lib/am57xx-fw
 	if(verbose)
 		std::cout << "Loading firmware into the PRU" << std::to_string(pruss) + "_" + std::to_string(prucore) << "\n";
-	IoUtils::writeTextFile(firmwarePath,firmware);	// reload the new fw in PRU
+	IoUtils::writeTextFile(firmwarePath, firmware);	// reload the new fw in PRU
 	// performs echo start > state
 	if(verbose)
 		std::cout << "Starting the PRU" << std::to_string(pruss) + "_" + std::to_string(prucore) << "\n";
@@ -82,12 +82,12 @@ int PruManagerRprocMmap::start(const std::string& path)
 
 void* PruManagerRprocMmap::getOwnMemory()
 {
-	return ownMemory.map(pru_addr[pru_num], 0x2000);	// addr is full address of the start of the PRU's RAM
+	return ownMemory.map(pruRamAddr[pru_num], 0x2000);	// addr is full address of the start of the PRU's RAM
 }
 
 void* PruManagerRprocMmap::getSharedMemory()
 {
-	return sharedMemory.map(pruss_addr[pruss], 0x8000);
+	return sharedMemory.map(sharedRamAddr[pruss], 0x8000);
 }
 #endif	// ENABLE_PRU_RPROC
 

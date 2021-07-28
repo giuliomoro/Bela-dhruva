@@ -40,8 +40,8 @@ public:
 	void* getOwnMemory();
 	void* getSharedMemory();
 private:
-	std::map<unsigned int, unsigned int> pru_addr;	// prunum : pru address
-	std::map<unsigned int, unsigned int> pruss_addr;	// pruss : pru sub-system address
+	std::map<unsigned int, unsigned int> pruRamAddr;	// prunum : pru address
+	std::map<unsigned int, unsigned int> sharedRamAddr;	// pruss : pru sub-system address
 	std::string basePath;
 	std::string statePath;
 	std::string firmwarePath;
