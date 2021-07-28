@@ -102,7 +102,6 @@ PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v)
 	if(prussdrv_open(PRU_EVTOUT_0)) {
 		fprintf(stderr, "Failed to open PRU driver\n");
 	}
-
 }
 
 int PruManagerUio::start(const std::string& Path)
@@ -144,7 +143,6 @@ void* PruManagerUio::getOwnMemory()
 	else
 		return pruDataRam;
 }
-
 
 void* PruManagerUio::getSharedMemory()
 {
