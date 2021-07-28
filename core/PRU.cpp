@@ -394,8 +394,6 @@ int PRU::initialise(BelaHw newBelaHw, int pru_num, bool uniformSampleRate, int m
 #if ENABLE_PRU_RPROC == 1
 	pruManager = new PruManagerRprocMmap(pru_number, gRTAudioVerbose);
 #endif	// ENABLE_PRU_UIO
-
-	// pruManager->start();
 	pruMemory = new PruMemory(pru_number, context, *pruManager);
 
 	if(0 <= stopButtonPin){
@@ -1517,8 +1515,8 @@ void PRU::waitForFinish()
 // Turn off the PRU when done
 void PRU::disable()
 {
-    /* Disable PRU and close memory mapping*/
-    pruManager->stop();
+	/* Disable PRU and close memory mapping*/
+	pruManager->stop();
 	running = false;
 }
 
