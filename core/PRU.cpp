@@ -14,11 +14,6 @@
  */
 
 #include "../include/PRU.h"
-#include "../include/PruBinary.h"
-
-#if ENABLE_PRU_UIO == 1
-#include <prussdrv.h>
-#endif
 
 #include "../include/digital_gpio_mapping.h"
 #include "../include/GPIOcontrol.h"
@@ -740,39 +735,24 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 #endif /* BELA_USE_RTDM */
 	pru_buffer_comm = pruMemory->getPruBufferComm();
 	initialisePruCommon(mcaspRegisters);
-
-	unsigned int* pruCode;
-	unsigned int pruCodeSize;
-	switch((int)pruUsesMcaspIrq) // (int) is here to avoid stupid compiler warning
-	{
-		case false:
-			pruCode = (unsigned int*)NonIrqPruCode::getBinary();
-			pruCodeSize = NonIrqPruCode::getBinarySize();
-			break;
-		case true:
-			pruCode = (unsigned int*)IrqPruCode::getBinary();
-			pruCodeSize = IrqPruCode::getBinarySize();
-			// NOTE: we assume that something else has masked the McASP interrupts
-			// from ARM, or rather that no one else unmasked them.
-			// For instance, make sure the McASP driver does not get to get hold of them
-			// by NOT setting `interrupt-names = "rx", "tx";` in the overlay
-			break;
-	}
+	// NOTE: we assume that something else has masked the McASP interrupts
+	// from ARM, or rather that no one else unmasked them.
+	// For instance, make sure the McASP driver does not get to get hold of them
+	// by NOT setting `interrupt-names = "rx", "tx";` in the overlay
 
 	/* Load and execute binary on PRU */
-#if ENABLE_PRU_UIO == 1
+	bool useEmbeddedPruCode = ("" == std::string(filename));
 	if(gRTAudioVerbose)
-		printf("Using %s PRU code\n", 0 == strlen(filename) ? "embedded" : filename);
-	if(pruManager->start(filename)) {
+		printf("Using %s %s PRU firmware\n", pruUsesMcaspIrq ? "McASP IRQ" : "Non-McASP IRQ", useEmbeddedPruCode ? "embedded" : filename);
+	if(useEmbeddedPruCode)
+		ret = pruManager->start(pruUsesMcaspIrq);
+	else
+		ret = pruManager->start(filename);
+	if(ret)
+	{
 		fprintf(stderr, "Failed to execute PRU code\n");
 		return 1;
 	}
-
-#endif	// ENABLE_PRU_UIO
-#if ENABLE_PRU_RPROC == 1
-// do something else probably? Or simply not required.
-#endif	// ENABLE_PRU_RPROC
-
 	running = true;
 	return 0;
 }

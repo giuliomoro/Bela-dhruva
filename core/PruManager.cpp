@@ -21,19 +21,13 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	 */
 	pru_num = pruNum;
 	verbose = v;
-	unsigned int pruss = pru_num / 2 + 1;
-	unsigned int prucore = pru_num % 2;
+	pruss = pru_num / 2 + 1;
+	prucore = pru_num % 2;
 
 	basePath = "/dev/remoteproc/pruss" + std::to_string(pruss) + "-core" + std::to_string(prucore) + "/";
 	statePath = basePath + "state";
 	firmwarePath = basePath + "firmware";
 	firmware = "am57xx-pru" + std::to_string(pruss) + "_" + std::to_string(prucore) + "-fw";
-# ifdef firmwareBelaRProc
-	std::string firmwareBela = firmwareBelaRProc;	// Incoming string from Makefile
-# else
-# error No Firmware File Found!! Pass the name of firmware.out file using firmwareBelaRProc=<path to file>
-# endif	// firmwareBelaRProc
-	firmwareCopyCommand = "sudo ln -s -f " + firmwareBela + " /lib/firmware/" + firmware;
 	// 0 : pru1-core 0 in AI -> 4b234000
 	// 1 : pru1-core 1 in AI -> 4b238000
 	// 2 : pru2-core 0 in AI -> 4b2b4000
@@ -66,9 +60,20 @@ void PruManagerRprocMmap::stop()
 	IoUtils::writeTextFile(statePath, "stop");
 }
 
+int PruManagerRprocMmap::start(bool useMcaspIrq)
+{
+# if (defined(firmwareBelaRProcNoMcaspIrq) && defined(firmwareBelaRProcMcaspIrq))
+	std::string firmwareBela = useMcaspIrq ? firmwareBelaRProcMcaspIrq : firmwareBelaRProcNoMcaspIrq; // Incoming strings from Makefile
+	return start(firmwareBela);
+# else
+# error No PRU firmware defined. Pass the name of firmware.out file using firmwareBelaRProcNoMcaspIrq=<path> and firmwareBelaRProcMcaspIrq=<path>
+# endif	// firmwareBelaRProc
+}
+
 int PruManagerRprocMmap::start(const std::string& path)
 {
 	stop();
+	std::string firmwareCopyCommand = "sudo ln -s -f " + path + " /lib/firmware/" + firmware;
 	system(firmwareCopyCommand.c_str());	// copies fw to /lib/am57xx-fw
 	if(verbose)
 		std::cout << "Loading firmware into the PRU" << std::to_string(pruss) + "_" + std::to_string(prucore) << "\n";
@@ -104,28 +109,35 @@ PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v)
 	}
 }
 
-int PruManagerUio::start(const std::string& Path)
+int PruManagerUio::start(bool useMcaspIrq)
 {
-	const char *path = Path.c_str();
-	if(path[0] == '\0') {
-		unsigned int* pruCode;
-		unsigned int pruCodeSize;
-		pruCode = (unsigned int*)IrqPruCode::getBinary();
-		pruCodeSize = IrqPruCode::getBinarySize();
-		if(prussdrv_exec_code(pru_num, pruCode, pruCodeSize)) {
-			fprintf(stderr, "Failed to execute PRU code\n");
-			return 1;
-		}
-		else
-			return 0;
+	unsigned int* pruCode;
+	unsigned int pruCodeSize;
+	switch((int)useMcaspIrq) // (int) is here to avoid stupid compiler warning
+	{
+		case false:
+			pruCode = (unsigned int*)NonIrqPruCode::getBinary();
+			pruCodeSize = NonIrqPruCode::getBinarySize();
+			break;
+		case true:
+			pruCode = (unsigned int*)IrqPruCode::getBinary();
+			pruCodeSize = IrqPruCode::getBinarySize();
+			break;
 	}
-	else {
-		if(prussdrv_exec_program(pru_num, path)) {
-			return 1;
-		}
-		else
-			return 0;
+	if(prussdrv_exec_code(pru_num, pruCode, pruCodeSize)) {
+		fprintf(stderr, "Failed to execute PRU code\n");
+		return 1;
 	}
+	else
+		return 0;
+}
+
+int PruManagerUio::start(const std::string& path)
+{
+	if(prussdrv_exec_program(pru_num, path.c_str())) {
+		return 1;
+	}
+	return 0;
 }
 
 void PruManagerUio::stop(){
