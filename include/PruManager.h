@@ -19,9 +19,9 @@
 
 class PruManager
 {
+	unsigned int pru_num, verbose;
 // expose parameters for the relevant paths
 public:
-	unsigned int pru_num, verbose;
 	virtual int start(bool useMcaspIrq) = 0;
 	virtual int start(const std::string& path) = 0;
 	virtual void stop() = 0;
