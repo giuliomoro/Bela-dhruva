@@ -10,6 +10,10 @@
 #include <iostream>
 
 #if ENABLE_PRU_RPROC == 1
+
+PruManager::~PruManager()
+{}
+
 PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 {
 	/* constructor for initializing the necessary path variables
