@@ -658,7 +658,38 @@ void PRU::initialisePruCommon(const McaspRegisters& mcaspRegisters)
 // Run the code image in the specified file
 int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 {
-	pruUsesMcaspIrq = true;
+	switch(belaHw)
+	{
+		case BelaHw_Bela:
+			//nobreak
+		case BelaHw_BelaMini:
+			//nobreak
+		case BelaHw_Salt:
+			pruUsesMcaspIrq = false;
+			break;
+		case BelaHw_BelaMiniMultiAudio:
+			//nobreak
+		case BelaHw_BelaMiniMultiTdm:
+                        //nobreak
+		case BelaHw_BelaMultiTdm:
+                        //nobreak
+		case BelaHw_BelaMiniMultiI2s:
+                        //nobreak
+		case BelaHw_CtagFace:
+			//nobreak
+		case BelaHw_CtagBeast:
+			//nobreak
+		case BelaHw_CtagFaceBela:
+			//nobreak
+		case BelaHw_CtagBeastBela:
+			pruUsesMcaspIrq = true;
+			break;
+		case BelaHw_NoHw:
+		default:
+			fprintf(stderr, "Error: unrecognized hardware\n");
+			return 1;
+	}
+
         if(gRTAudioVerbose)
                 printf("%ssing McASP->PRU irq\n", pruUsesMcaspIrq ? "U" : "Not u");
 
