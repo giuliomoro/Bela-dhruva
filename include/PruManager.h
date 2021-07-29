@@ -19,15 +19,19 @@
 
 class PruManager
 {
-	unsigned int pru_num, verbose;
-// expose parameters for the relevant paths
+protected:
+	unsigned int pruss;
+	unsigned int prucore;
+	int verbose;
+	std::string pruStringId;
 public:
+	PruManager(unsigned int pruNum, int v);
+	virtual ~PruManager() = 0;
 	virtual int start(bool useMcaspIrq) = 0;
 	virtual int start(const std::string& path) = 0;
 	virtual void stop() = 0;
 	virtual void* getOwnMemory() = 0;
 	virtual void* getSharedMemory() = 0;
-	virtual ~PruManager() = 0;
 };
 
 #if ENABLE_PRU_RPROC == 1
@@ -35,7 +39,7 @@ class PruManagerRprocMmap : public PruManager
 {
 // use rproc for start/stop and mmap for memory sharing
 public:
-	PruManagerRprocMmap(unsigned int pruNum = 0, unsigned int v = 0);
+	PruManagerRprocMmap(unsigned int pruNum, int v);
 	void stop();
 	int start(bool useMcaspIrq);
 	int start(const std::string& path);
@@ -47,10 +51,6 @@ private:
 	std::string statePath;
 	std::string firmwarePath;
 	std::string firmware;
-	unsigned int pru_num;
-	unsigned int verbose;
-	unsigned int pruss;
-	unsigned int prucore;
 	Mmap ownMemory;
 	Mmap sharedMemory;
 };
@@ -63,7 +63,7 @@ class PruManagerUio : public PruManager
  * It has the libprussdrv calls currently present in the codebase
 */
 public:
-	PruManagerUio(unsigned int pruNum = 0, unsigned int v = 0);
+	PruManagerUio(unsigned int pruNum, int v);
 	int start(bool useMcaspIrq);
 	int start(const std::string& path);
 	void stop();

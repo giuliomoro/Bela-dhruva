@@ -9,6 +9,20 @@
 #include "MiscUtilities.h"
 #include <iostream>
 
+PruManager::PruManager(unsigned int pruNum, int v)
+{
+	/* based on the value of pru_num to choose:
+	 * 0 for PRUSS1 core 0
+	 * 1 for PRUSS1 core 1
+	 * 2 for PRUSS2 core 0
+	 * 3 for PRUSS2 core 1
+	 */
+	verbose = v;
+	pruss = pruNum / 2 + 1;
+	prucore = pruNum % 2;
+	pruStringId = "PRU" + std::to_string(pruss) + "_" + std::to_string(prucore);
+}
+
 PruManager::~PruManager()
 {}
 
@@ -16,20 +30,9 @@ PruManager::~PruManager()
 const std::vector<uint32_t> prussOwnRamOffsets = {0x0, 0x2000};
 const uint32_t prussSharedRamOffset = 0x10000;
 
-PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
+PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, int v) :
+	PruManager(pruNum, v)
 {
-	/* constructor for initializing the necessary path variables
-	 * based on the value of pru_num to choose:
-	 * 0 for PRU1 core 0
-	 * 1 for PRU1 core 1
-	 * 2 for PRU2 core 0
-	 * 3 for PRU2 core 1
-	 */
-	pru_num = pruNum;
-	verbose = v;
-	pruss = pru_num / 2 + 1;
-	prucore = pru_num % 2;
-
 	basePath = "/dev/remoteproc/pruss" + std::to_string(pruss) + "-core" + std::to_string(prucore) + "/";
 	statePath = basePath + "state";
 	firmwarePath = basePath + "firmware";
@@ -48,7 +51,7 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 void PruManagerRprocMmap::stop()
 {	// performs echo stop > state
 	if(verbose)
-		std::cout << "Stopping the PRU" << std::to_string(pruss) + "_" + std::to_string(prucore) << "\n";
+		printf("Stopping %s\n", pruStringId.c_str());
 	IoUtils::writeTextFile(statePath, "stop");
 }
 
@@ -69,11 +72,11 @@ int PruManagerRprocMmap::start(const std::string& path)
 	std::string firmwareCopyCommand = "ln -s -f " + path + " " + symlinkTarget;
 	system(firmwareCopyCommand.c_str());
 	if(verbose)
-		printf("Loading firmware into PRU%d_%d: %s symlinked from %s\n", pruss, prucore, symlinkTarget.c_str(), path.c_str());
+		printf("Loading firmware into %s: %s symlinked from %s\n", pruStringId.c_str(), symlinkTarget.c_str(), path.c_str());
 	IoUtils::writeTextFile(firmwarePath, firmware);	// reload the new fw in PRU
 	// performs echo start > state
 	if(verbose)
-		printf("Starting PRU%d_%d\n", pruss, prucore);
+		printf("Starting %s\n", pruStringId.c_str());
 	IoUtils::writeTextFile(statePath, "start");
 	return 0;	// TODO: If system returns any error then detect it and then return 1 instead
 }
@@ -92,10 +95,9 @@ void* PruManagerRprocMmap::getSharedMemory()
 #if ENABLE_PRU_UIO == 1
 #include "../include/PruBinary.h"
 
-PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v)
+PruManagerUio::PruManagerUio(unsigned int pruNum, unsigned int v) :
+	PruManager(pruNum, v)
 {
-	pru_num = pruNum;
-	verbose = v;
 	prussdrv_init();
 	if(prussdrv_open(PRU_EVTOUT_0)) {
 		fprintf(stderr, "Failed to open PRU driver\n");
@@ -117,7 +119,7 @@ int PruManagerUio::start(bool useMcaspIrq)
 			pruCodeSize = IrqPruCode::getBinarySize();
 			break;
 	}
-	if(prussdrv_exec_code(pru_num, pruCode, pruCodeSize)) {
+	if(prussdrv_exec_code(prucore, pruCode, pruCodeSize)) {
 		fprintf(stderr, "Failed to execute PRU code\n");
 		return 1;
 	}
@@ -127,7 +129,7 @@ int PruManagerUio::start(bool useMcaspIrq)
 
 int PruManagerUio::start(const std::string& path)
 {
-	if(prussdrv_exec_program(pru_num, path.c_str())) {
+	if(prussdrv_exec_program(prucore, path.c_str())) {
 		return 1;
 	}
 	return 0;
@@ -135,14 +137,14 @@ int PruManagerUio::start(const std::string& path)
 
 void PruManagerUio::stop(){
 	if(verbose)
-		std::cout << "Stopping the PRU" << pru_num << "\n";
-	prussdrv_pru_disable(pru_num);
+		printf("Stopping %s\n", pruStringId.c_str());
+	prussdrv_pru_disable(prucore);
 }
 
 void* PruManagerUio::getOwnMemory()
 {
 	void* pruDataRam;
-	int ret = prussdrv_map_prumem (pru_num == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
+	int ret = prussdrv_map_prumem (prucore == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
 	if(ret)
 		return NULL;
 	else
