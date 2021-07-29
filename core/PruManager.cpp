@@ -34,10 +34,10 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	statePath = basePath + "state";
 	firmwarePath = basePath + "firmware";
 	firmware = "am57xx-pru" + std::to_string(pruss) + "_" + std::to_string(prucore) + "-fw";
-	// 0 : pru1-core 0 in AI -> 4b234000
-	// 1 : pru1-core 1 in AI -> 4b238000
-	// 2 : pru2-core 0 in AI -> 4b2b4000
-	// 3 : pru2-core 1 in AI -> 4b2b8000
+	// 0 : pru1-core 0 in AI -> 0x4b200000
+	// 1 : pru1-core 1 in AI -> 0x4b202000
+	// 2 : pru2-core 0 in AI -> 0x4b202000
+	// 3 : pru2-core 1 in AI -> 0x4b282000
 	//
 	// 1 : PRUSS address in AI for PRU 1
 	// 2 : PRUSS address in AI for PRU 2
@@ -46,16 +46,13 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	// 1 : pru-core 1 in BBB -> 4a338000
 
 # ifdef IS_AM572x	// base addresses for BBAI
-	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(0, 0x4b234000));
-	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4b238000));
-	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b2b4000));
-	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(3, 0x4b2b8000));
+	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(0, 0x4b200000));
+	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4b202000));
+	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b280000));
+	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(3, 0x4b282000));
 
-	// sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4b200000));
-	// sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b280000));
-	prussAddresses.push_back(0x4b200000);
-	prussAddresses.push_back(0x4b280000);
-
+	sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4b210000));
+	sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b290000));
 # else	// base addresses for BBB
 	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(0, 0x4a334000));
 	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4a338000));
