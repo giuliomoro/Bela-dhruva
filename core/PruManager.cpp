@@ -34,28 +34,13 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	statePath = basePath + "state";
 	firmwarePath = basePath + "firmware";
 	firmware = "am57xx-pru" + std::to_string(pruss) + "_" + std::to_string(prucore) + "-fw";
-	// 0 : pru1-core 0 in AI -> 0x4b200000
-	// 1 : pru1-core 1 in AI -> 0x4b202000
-	// 2 : pru2-core 0 in AI -> 0x4b202000
-	// 3 : pru2-core 1 in AI -> 0x4b282000
-	//
-	// 1 : PRUSS address in AI for PRU 1
-	// 2 : PRUSS address in AI for PRU 2
-	//
-	// 0 : pru-core 0 in BBB -> 4a334000
-	// 1 : pru-core 1 in BBB -> 4a338000
 
 # ifdef IS_AM572x	// base addresses for BBAI
-	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(0, 0x4b200000));
-	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4b202000));
-	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b280000));
-	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(3, 0x4b282000));
-
-	sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4b210000));
-	sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b290000));
-# else	// base addresses for BBB
-	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(0, 0x4a334000));
-	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4a338000));
+	prussAddresses.push_back(0x4b200000);
+	prussAddresses.push_back(0x4b280000);
+# else	// TODO: base addresses for BBB to be used via Mmap
+	prussAddresses.push_back(0x4a334000);
+	prussAddresses.push_back(0x4a338000);	// Warning: these addresses may be wrong. Please refer the AM335x manual to verify
 # endif	// IS_AM572x
 }
 
@@ -93,14 +78,12 @@ int PruManagerRprocMmap::start(const std::string& path)
 
 void* PruManagerRprocMmap::getOwnMemory()
 {
-	// return ownMemory.map(pruRamAddr[pru_num], 0x2000);	// addr is full address of the start of the PRU's RAM
-	return ownMemory.map(prussAddresses[pruss] + prussOwnRamOffsets[prucore], 0x2000);
+	return ownMemory.map(prussAddresses[pruss - 1] + prussOwnRamOffsets[prucore], 0x2000);
 }
 
 void* PruManagerRprocMmap::getSharedMemory()
 {
-	// return sharedMemory.map(sharedRamAddr[pruss], 0x8000);
-	return sharedMemory.map(prussAddresses[pruss] + prussSharedRamOffset, 0x8000);
+	return sharedMemory.map(prussAddresses[pruss - 1] + prussSharedRamOffset, 0x8000);
 }
 #endif	// ENABLE_PRU_RPROC
 
