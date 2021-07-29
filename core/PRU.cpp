@@ -742,13 +742,14 @@ int PRU::start(char * const filename, const McaspRegisters& mcaspRegisters)
 
 	/* Load and execute binary on PRU */
 	bool useEmbeddedPruCode = ("" == std::string(filename));
+	unsigned int pruManager_ret = 0;
 	if(gRTAudioVerbose)
 		printf("Using %s %s PRU firmware\n", pruUsesMcaspIrq ? "McASP IRQ" : "Non-McASP IRQ", useEmbeddedPruCode ? "embedded" : filename);
 	if(useEmbeddedPruCode)
-		ret = pruManager->start(pruUsesMcaspIrq);
+		pruManager_ret = pruManager->start(pruUsesMcaspIrq);
 	else
-		ret = pruManager->start(filename);
-	if(ret)
+		pruManager_ret = pruManager->start(filename);
+	if(pruManager_ret)
 	{
 		fprintf(stderr, "Failed to execute PRU code\n");
 		return 1;
