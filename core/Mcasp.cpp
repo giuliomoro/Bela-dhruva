@@ -12,7 +12,7 @@ McaspConfig::McaspConfig()
 	params.auxClkIn = 20000000;	// workaround due to unexpected sys_clk2 frequency
 #else
 	params.auxClkIn = 24000000;
-#endif
+#endif	// IS_AM572x
 }
 
 double McaspConfig::getValidAhclk(double desiredClk, unsigned int* outDiv)
