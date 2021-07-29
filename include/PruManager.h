@@ -15,6 +15,7 @@
 #endif
 
 #include <map>
+#include <vector>
 #include "Mmap.h"
 
 class PruManager
@@ -27,7 +28,7 @@ public:
 	virtual void stop() = 0;
 	virtual void* getOwnMemory() = 0;
 	virtual void* getSharedMemory() = 0;
-	~PruManager()=0;
+	~PruManager();
 };
 
 #if ENABLE_PRU_RPROC == 1
@@ -42,6 +43,7 @@ public:
 	void* getOwnMemory();
 	void* getSharedMemory();
 private:
+	std::vector<uint32_t> prussAddresses;
 	std::map<unsigned int, unsigned int> pruRamAddr;	// prunum : pru address
 	std::map<unsigned int, unsigned int> sharedRamAddr;	// pruss : pru sub-system address
 	std::string basePath;

@@ -9,10 +9,12 @@
 #include "MiscUtilities.h"
 #include <iostream>
 
-#if ENABLE_PRU_RPROC == 1
-
 PruManager::~PruManager()
 {}
+
+#if ENABLE_PRU_RPROC == 1
+const std::vector<uint32_t> prussOwnRamOffsets = {0x0, 0x2000};
+const uint32_t prussSharedRamOffset = 0x10000;
 
 PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 {
@@ -49,8 +51,11 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b2b4000));
 	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(3, 0x4b2b8000));
 
-	sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4b200000));
-	sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b280000));
+	// sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4b200000));
+	// sharedRamAddr.insert(std::pair<unsigned int, unsigned int>(2, 0x4b280000));
+	prussAddresses.push_back(0x4b200000);
+	prussAddresses.push_back(0x4b280000);
+
 # else	// base addresses for BBB
 	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(0, 0x4a334000));
 	pruRamAddr.insert(std::pair<unsigned int, unsigned int>(1, 0x4a338000));
@@ -91,12 +96,14 @@ int PruManagerRprocMmap::start(const std::string& path)
 
 void* PruManagerRprocMmap::getOwnMemory()
 {
-	return ownMemory.map(pruRamAddr[pru_num], 0x2000);	// addr is full address of the start of the PRU's RAM
+	// return ownMemory.map(pruRamAddr[pru_num], 0x2000);	// addr is full address of the start of the PRU's RAM
+	return ownMemory.map(prussAddresses[pruss] + prussOwnRamOffsets[prucore], 0x2000);
 }
 
 void* PruManagerRprocMmap::getSharedMemory()
 {
-	return sharedMemory.map(sharedRamAddr[pruss], 0x8000);
+	// return sharedMemory.map(sharedRamAddr[pruss], 0x8000);
+	return sharedMemory.map(prussAddresses[pruss] + prussSharedRamOffset, 0x8000);
 }
 #endif	// ENABLE_PRU_RPROC
 
