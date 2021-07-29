@@ -13,6 +13,9 @@ PruManager::~PruManager()
 {}
 
 #if ENABLE_PRU_RPROC == 1
+const std::vector<uint32_t> prussOwnRamOffsets = {0x0, 0x2000};
+const uint32_t prussSharedRamOffset = 0x10000;
+
 PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 {
 	/* constructor for initializing the necessary path variables
