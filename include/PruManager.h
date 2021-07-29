@@ -21,7 +21,7 @@ class PruManager
 {
 protected:
 	unsigned int pruss;
-	unsigned int prucore;
+	unsigned int pruCore;
 	int verbose;
 	std::string pruStringId;
 public:

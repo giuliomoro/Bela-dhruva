@@ -19,8 +19,8 @@ PruManager::PruManager(unsigned int pruNum, int v)
 	 */
 	verbose = v;
 	pruss = pruNum / 2 + 1;
-	prucore = pruNum % 2;
-	pruStringId = "PRU" + std::to_string(pruss) + "_" + std::to_string(prucore);
+	pruCore = pruNum % 2;
+	pruStringId = "PRU" + std::to_string(pruss) + "_" + std::to_string(pruCore);
 }
 
 PruManager::~PruManager()
@@ -33,10 +33,10 @@ const uint32_t prussSharedRamOffset = 0x10000;
 PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, int v) :
 	PruManager(pruNum, v)
 {
-	basePath = "/dev/remoteproc/pruss" + std::to_string(pruss) + "-core" + std::to_string(prucore) + "/";
+	basePath = "/dev/remoteproc/pruss" + std::to_string(pruss) + "-core" + std::to_string(pruCore) + "/";
 	statePath = basePath + "state";
 	firmwarePath = basePath + "firmware";
-	firmware = "am57xx-pru" + std::to_string(pruss) + "_" + std::to_string(prucore) + "-fw";
+	firmware = "am57xx-pru" + std::to_string(pruss) + "_" + std::to_string(pruCore) + "-fw";
 
 # ifdef IS_AM572x	// base addresses for BBAI
 	prussAddresses.push_back(0x4b200000);
@@ -83,7 +83,7 @@ int PruManagerRprocMmap::start(const std::string& path)
 
 void* PruManagerRprocMmap::getOwnMemory()
 {
-	return ownMemory.map(prussAddresses[pruss - 1] + prussOwnRamOffsets[prucore], 0x2000);
+	return ownMemory.map(prussAddresses[pruss - 1] + prussOwnRamOffsets[pruCore], 0x2000);
 }
 
 void* PruManagerRprocMmap::getSharedMemory()
@@ -119,7 +119,7 @@ int PruManagerUio::start(bool useMcaspIrq)
 			pruCodeSize = IrqPruCode::getBinarySize();
 			break;
 	}
-	if(prussdrv_exec_code(prucore, pruCode, pruCodeSize)) {
+	if(prussdrv_exec_code(pruCore, pruCode, pruCodeSize)) {
 		fprintf(stderr, "Failed to execute PRU code\n");
 		return 1;
 	}
@@ -129,7 +129,7 @@ int PruManagerUio::start(bool useMcaspIrq)
 
 int PruManagerUio::start(const std::string& path)
 {
-	if(prussdrv_exec_program(prucore, path.c_str())) {
+	if(prussdrv_exec_program(pruCore, path.c_str())) {
 		return 1;
 	}
 	return 0;
@@ -138,13 +138,13 @@ int PruManagerUio::start(const std::string& path)
 void PruManagerUio::stop(){
 	if(verbose)
 		printf("Stopping %s\n", pruStringId.c_str());
-	prussdrv_pru_disable(prucore);
+	prussdrv_pru_disable(pruCore);
 }
 
 void* PruManagerUio::getOwnMemory()
 {
 	void* pruDataRam;
-	int ret = prussdrv_map_prumem (prucore == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
+	int ret = prussdrv_map_prumem (pruCore == 0 ? PRUSS0_PRU0_DATARAM : PRUSS0_PRU1_DATARAM, (void**)&pruDataRam);
 	if(ret)
 		return NULL;
 	else
