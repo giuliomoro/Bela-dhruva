@@ -14,7 +14,7 @@
 #include <prussdrv.h>
 #endif
 
-#include <map>
+#include <vector>
 #include "Mmap.h"
 
 class PruManager
@@ -42,8 +42,7 @@ public:
 	void* getOwnMemory();
 	void* getSharedMemory();
 private:
-	std::map<unsigned int, unsigned int> pruRamAddr;	// prunum : pru address
-	std::map<unsigned int, unsigned int> sharedRamAddr;	// pruss : pru sub-system address
+	std::vector<uint32_t> prussAddresses;
 	std::string basePath;
 	std::string statePath;
 	std::string firmwarePath;
@@ -70,7 +69,6 @@ public:
 	void stop();
 	void* getOwnMemory();
 	void* getSharedMemory();
-private:
 };
 
 #endif	// ENABLE_PRU_UIO
