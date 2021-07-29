@@ -178,7 +178,6 @@ public:
 
 	// Exit the whole PRU subsystem
 	void exitPRUSS();
-
 	PruManager *pruManager;
 
 private:
