@@ -294,28 +294,37 @@ ifeq ($(XENOMAI_VERSION),3)
   BELA_USE_DEFINE=BELA_USE_RTDM
 endif
 
-IS_AM572x = $(shell grep -q AI /proc/device-tree/model && echo '-DIS_AM572x')
-
-ifeq ($(AT),)
-  $(info  AI flag = $(IS_AM572x))
-endif
+IS_AM572x ?= $(shell grep -q AI /proc/device-tree/model && echo 1 || echo 0)
 
 #	Flag for using/ not using (UIO+prussdrv)/(RPROC+Mmap)
-ifneq (,$(findstring IS,$(IS_AM572x)))
+ifeq (1,$(strip $(IS_AM572x)))
   ENABLE_PRU_UIO = 0
   ENABLE_PRU_RPROC = 1
-  firmwareBelaRProcNoMcaspIrq = $(BELA_DIR)/build/pru/pru_rtaudio_bin.out
-  firmwareBelaRProcMcaspIrq = $(BELA_DIR)/build/pru/pru_rtaudio_irq_bin.out
+  BOARD_COMMON_FLAGS = -DIS_AM572x
 else
   ENABLE_PRU_UIO = 1
   ENABLE_PRU_RPROC = 0
+  BOARD_COMMON_FLAGS =
 endif
 
-DEFAULT_COMMON_FLAGS := $(DEFAULT_XENOMAI_CFLAGS) -O3 -g -march=armv7-a -mtune=cortex-a8 -mfloat-abi=hard -mfpu=neon -ftree-vectorize -ffast-math -DNDEBUG -D$(BELA_USE_DEFINE) -I$(BASE_DIR)/resources/$(DEBIAN_VERSION)/include -save-temps=obj $(IS_AM572x) -DENABLE_PRU_UIO=$(ENABLE_PRU_UIO) -DENABLE_PRU_RPROC=$(ENABLE_PRU_RPROC) -DfirmwareBelaRProcMcaspIrq=\"$(firmwareBelaRProcMcaspIrq)\" -DfirmwareBelaRProcNoMcaspIrq=\"$(firmwareBelaRProcNoMcaspIrq)\"
+ifeq (,$(AT))
+  $(info BOARD IS_AM572x? $(IS_AM572x))
+endif
+
+ifeq (1,$(strip $(ENABLE_PRU_RPROC)))
+  firmwareBelaRProcNoMcaspIrq = $(BELA_DIR)/build/pru/pru_rtaudio_bin.out
+  firmwareBelaRProcMcaspIrq = $(BELA_DIR)/build/pru/pru_rtaudio_irq_bin.out
+  BOARD_CORE_LDLIBS =
+endif
+ifeq (1,$(strip $(ENABLE_PRU_UIO)))
+  BOARD_CORE_LDLIBS = -lprussdrv
+endif
+
+DEFAULT_COMMON_FLAGS := $(DEFAULT_XENOMAI_CFLAGS) -O3 -g -march=armv7-a -mtune=cortex-a8 -mfloat-abi=hard -mfpu=neon -ftree-vectorize -ffast-math -DNDEBUG -D$(BELA_USE_DEFINE) -I$(BASE_DIR)/resources/$(DEBIAN_VERSION)/include -save-temps=obj -DENABLE_PRU_UIO=$(ENABLE_PRU_UIO) -DENABLE_PRU_RPROC=$(ENABLE_PRU_RPROC) -DfirmwareBelaRProcMcaspIrq='"$(firmwareBelaRProcMcaspIrq)"' -DfirmwareBelaRProcNoMcaspIrq='"$(firmwareBelaRProcNoMcaspIrq)"' $(BOARD_COMMON_FLAGS)
 DEFAULT_CPPFLAGS := $(DEFAULT_COMMON_FLAGS) -std=c++11
 DEFAULT_CFLAGS := $(DEFAULT_COMMON_FLAGS) -std=gnu11
 BELA_LDFLAGS = -Llib/
-BELA_CORE_LDLIBS = $(DEFAULT_XENOMAI_LDFLAGS) -lprussdrv -lstdc++ # libraries needed by core code (libbela.so)
+BELA_CORE_LDLIBS = $(DEFAULT_XENOMAI_LDFLAGS) $(BOARD_CORE_LDLIBS) -lstdc++ # libraries needed by core code (libbela.so)
 BELA_EXTRA_LDLIBS =$(DEFAULT_XENOMAI_LDFLAGS) -lasound -lseasocks -lNE10 # additional libraries needed by extra code (libbelaextra.so)
 BELA_LDLIBS = $(BELA_CORE_LDLIBS) $(BELA_EXTRA_LDLIBS)
 ifeq ($(PROJECT_TYPE),libpd)
