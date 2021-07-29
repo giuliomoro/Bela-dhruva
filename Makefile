@@ -288,10 +288,10 @@ LEGACY_INCLUDE_PATH := ./include/legacy
 
 INCLUDES := -I$(PROJECT_DIR) -I$(LEGACY_INCLUDE_PATH)  -I./include -I./build/pru/ -I./
 ifeq ($(XENOMAI_VERSION),2.6)
-  BELA_USE_DEFINE=BELA_USE_POLL
+  BELA_USE_DEFINE?=BELA_USE_POLL
 endif
 ifeq ($(XENOMAI_VERSION),3)
-  BELA_USE_DEFINE=BELA_USE_RTDM
+  BELA_USE_DEFINE?=BELA_USE_RTDM
 endif
 
 IS_AM572x ?= $(shell grep -q AI /proc/device-tree/model && echo 1 || echo 0)
