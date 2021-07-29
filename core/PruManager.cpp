@@ -64,14 +64,15 @@ int PruManagerRprocMmap::start(bool useMcaspIrq)
 int PruManagerRprocMmap::start(const std::string& path)
 {
 	stop();
-	std::string firmwareCopyCommand = "sudo ln -s -f " + path + " /lib/firmware/" + firmware;
-	system(firmwareCopyCommand.c_str());	// copies fw to /lib/am57xx-fw
+	std::string symlinkTarget = "/lib/firmware/" + firmware;
+	std::string firmwareCopyCommand = "ln -s -f " + path + " " + symlinkTarget;
+	system(firmwareCopyCommand.c_str());
 	if(verbose)
-		std::cout << "Loading firmware into the PRU" << std::to_string(pruss) + "_" + std::to_string(prucore) << "\n";
+		printf("Loading firmware into PRU%d_%d: %s symlinked from %s\n", pruss, prucore, symlinkTarget.c_str(), path.c_str());
 	IoUtils::writeTextFile(firmwarePath, firmware);	// reload the new fw in PRU
 	// performs echo start > state
 	if(verbose)
-		std::cout << "Starting the PRU" << std::to_string(pruss) + "_" + std::to_string(prucore) << "\n";
+		printf("Starting PRU%d_%d\n", pruss, prucore);
 	IoUtils::writeTextFile(statePath, "start");
 	return 0;	// TODO: If system returns any error then detect it and then return 1 instead
 }
