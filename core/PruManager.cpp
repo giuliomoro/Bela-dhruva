@@ -39,8 +39,9 @@ PruManagerRprocMmap::PruManagerRprocMmap(unsigned int pruNum, unsigned int v)
 	prussAddresses.push_back(0x4b200000);
 	prussAddresses.push_back(0x4b280000);
 # else	// TODO: base addresses for BBB to be used via Mmap
+#warning Untested PRU addresses for am3358
 	prussAddresses.push_back(0x4a334000);
-	prussAddresses.push_back(0x4a338000);	// Warning: these addresses may be wrong. Please refer the AM335x manual to verify
+	prussAddresses.push_back(0x4a338000);
 # endif	// IS_AM572x
 }
 
