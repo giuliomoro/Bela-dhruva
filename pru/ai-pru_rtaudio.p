@@ -172,17 +172,17 @@
 // Constants used for this particular audio setup
 #define MCASP_BASE 	MCASP0_BASE
 #ifdef DBOX_CAPE
-# ifdef IS_AM572x
+#ifdef IS_AM572x
 #define MCASP_SRCTL_X	MCASP_SRCTL11	// Ser. 2 is transmitter
 #define MCASP_SRCTL_R	MCASP_SRCTL10	// Ser. 0 is receiver
 #define MCASP_XBUF	MCASP_XBUF11
 #define MCASP_RBUF	MCASP_RBUF10
-# else
+#else
 #define MCASP_SRCTL_X	MCASP_SRCTL2	// Ser. 2 is transmitter
 #define MCASP_SRCTL_R	MCASP_SRCTL0	// Ser. 0 is receiver
 #define MCASP_XBUF	MCASP_XBUF2
 #define MCASP_RBUF	MCASP_RBUF0
-# endif
+#endif  // IS_AM572x
 #else
 #define MCASP_SRCTL_X	MCASP_SRCTL3	// Ser. 3 is transmitter
 #define MCASP_SRCTL_R	MCASP_SRCTL2	// Ser. 2 is receiver
@@ -196,11 +196,11 @@
 #define MCASP_PIN_AMUTE		(1 << 25)	// Also, 0 to 3 are XFR0 to XFR3
 
 #ifdef DBOX_CAPE
-# ifdef IS_AM572x
+#ifdef IS_AM572x
 #define MCASP_OUTPUT_PINS   	MCASP_PIN_AHCLKX | (1 << 11) // AHCLKX and AXR2 outputs
-# else
+#else
 #define MCASP_OUTPUT_PINS   	MCASP_PIN_AHCLKX | (1 << 2) // AHCLKX and AXR2 outputs
-# endif
+#endif  // IS_AM572x
 #else
 #define MCASP_OUTPUT_PINS   	(1 << 3)	// Which pins are outputs
 #endif
