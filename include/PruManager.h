@@ -27,6 +27,7 @@ public:
 	virtual void stop() = 0;
 	virtual void* getOwnMemory() = 0;
 	virtual void* getSharedMemory() = 0;
+	virtual ~PruManager() = 0;
 };
 
 #if ENABLE_PRU_RPROC == 1
