@@ -81,8 +81,8 @@ void loop(void*)
 
 bool setup(BelaContext *context, void *userData)
 {
-	// Setup a Trill Bar sensor on i2c bus 1, using the default mode and address
-	if(touchSensor.setup(1, Trill::BAR) != 0) {
+	// Setup a Trill Bar sensor on i2c bus 2 on BBAI, using the default mode and address
+	if(touchSensor.setup(2, Trill::BAR) != 0) {
 		fprintf(stderr, "Unable to initialise Trill Bar\n");
 		return false;
 	}
