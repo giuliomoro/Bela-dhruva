@@ -7,19 +7,19 @@
 http://bela.io
 */
 /**
-\example Trill/bar-led/render.cpp
+\example Trill/bar-audio-led/render.cpp
 
 Trill Bar Sound + LED
 =============
 
-This is example of how to communicate with the Trill Bar sensor using
-the Trill library. It also visualises position of different touches in real time via
+This is a demo example of how to communicate with the Trill Bar sensor using
+the Trill library on the BeagleBone AI. It also visualises position of different touches in real time via
 a series of LEDs connected to the digital outputs.
 
 The Trill sensor is scanned on an auxiliary task running parallel to the audio thread
 and the number of active touches, their position and size stored on global variables.
 
-Twelve LEDs are used to represent positions on the Trill sensor. The length of the
+4 LEDs are used to represent positions on the Trill sensor. The length of the
 Trill Bar sensor is divided into 12 different sections. When a touch
 occurs on one of these sections, the corresponding LED turns on.
 */
